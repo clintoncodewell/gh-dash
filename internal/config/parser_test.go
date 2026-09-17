@@ -45,6 +45,31 @@ var keybindSorter = cmp.Transformer("Sort", func(in []Keybinding) []Keybinding {
 	return out
 })
 
+func TestMergeIssueColumnVisibilityOverrides(t *testing.T) {
+	defaultWidth := 5
+	defaultHidden := true
+	defaultColumn := ColumnConfig{
+		Width:  &defaultWidth,
+		Hidden: &defaultHidden,
+	}
+
+	t.Run("explicit visibility override shows a hidden default column", func(t *testing.T) {
+		visible := false
+		merged := MergeColumnConfigs(defaultColumn, ColumnConfig{Hidden: &visible})
+
+		require.False(t, *merged.Hidden)
+		require.Equal(t, 5, *merged.Width)
+	})
+
+	t.Run("width-only override preserves hidden default", func(t *testing.T) {
+		customWidth := 9
+		merged := MergeColumnConfigs(defaultColumn, ColumnConfig{Width: &customWidth})
+
+		require.True(t, *merged.Hidden)
+		require.Equal(t, 9, *merged.Width)
+	})
+}
+
 func Testwd(t *testing.T) string {
 	_, filename, _, _ := runtime.Caller(0)
 	return path.Dir(filename)
@@ -65,8 +90,11 @@ func TestParser(t *testing.T) {
 		parsed, err := ParseConfig(Location{})
 		testutils.AssertNoError(t, err)
 		require.Len(t, parsed.PRSections, 3)
-		require.Equal(t, 0.70, parsed.Defaults.Preview.Width)
+		require.Equal(t, 0.575, parsed.Defaults.Preview.Width)
 		require.Equal(t, "right", parsed.Defaults.Preview.Position)
+		require.True(t, *parsed.Defaults.Layout.Issues.Creator.Hidden)
+		require.True(t, *parsed.Defaults.Layout.Issues.Reactions.Hidden)
+		require.True(t, *parsed.Defaults.Layout.Issues.CreatedAt.Hidden)
 	})
 
 	t.Run("Should read config passed by flag with highest priority", func(t *testing.T) {

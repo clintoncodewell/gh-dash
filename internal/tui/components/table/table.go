@@ -312,7 +312,7 @@ func (m *Model) renderBody() string {
 		return bodyStyle.Render(*m.EmptyState)
 	}
 
-	return m.rowsViewport.View()
+	return common.MarkMouseZone("section-rows", m.rowsViewport.View())
 }
 
 func (m *Model) renderRow(rowId int, headerColumns []string) string {

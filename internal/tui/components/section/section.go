@@ -215,8 +215,7 @@ func (m *BaseModel) SetCurrRow(row int) int {
 }
 
 func (m *BaseModel) RowAtOffset(offset int) int {
-	tableOffset := offset - common.SearchHeight - common.TableHeaderHeight
-	return m.Table.RowAtOffset(tableOffset)
+	return m.Table.RowAtOffset(offset)
 }
 
 func (m *BaseModel) HasRepoNameInConfiguredFilter() bool {

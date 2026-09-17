@@ -1677,8 +1677,18 @@ func TestSuccessfulIssueArchiveRefreshesIssueColumns(t *testing.T) {
 }
 
 func TestMouseClickSelectsRenderedRow(t *testing.T) {
-	for _, compact := range []bool{true, false} {
-		t.Run(map[bool]string{true: "compact", false: "comfortable"}[compact], func(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		compact       bool
+		customSpacing bool
+		scrolled      bool
+	}{
+		{name: "compact", compact: true},
+		{name: "comfortable", compact: false},
+		{name: "rendered theme spacing", compact: false, customSpacing: true},
+		{name: "scrolled viewport", compact: false, scrolled: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
 			zone.NewGlobal()
 			zone.SetEnabled(true)
 
@@ -1687,7 +1697,7 @@ func TestMouseClickSelectsRenderedRow(t *testing.T) {
 				SkipGlobalConfig: true,
 			})
 			require.NoError(t, err)
-			cfg.Theme.Ui.Table.Compact = compact
+			cfg.Theme.Ui.Table.Compact = tc.compact
 			ctx := &context.ProgramContext{
 				Config:       &cfg,
 				ScreenWidth:  120,
@@ -1697,6 +1707,10 @@ func TestMouseClickSelectsRenderedRow(t *testing.T) {
 			}
 			ctx.Theme = theme.ParseTheme(ctx.Config)
 			ctx.Styles = context.InitStyles(ctx.Theme)
+			if tc.customSpacing {
+				ctx.Styles.Search.Root = ctx.Styles.Search.Root.PaddingTop(1)
+				ctx.Styles.Table.HeaderStyle = ctx.Styles.Table.HeaderStyle.Height(3)
+			}
 
 			prSection := prssection.NewModel(
 				0,
@@ -1705,9 +1719,15 @@ func TestMouseClickSelectsRenderedRow(t *testing.T) {
 				time.Now(),
 				time.Now(),
 			)
-			prSection.Prs = []prrow.Data{
-				{Primary: &data.PullRequestData{Number: 1, Title: "first"}},
-				{Primary: &data.PullRequestData{Number: 2, Title: "second"}},
+			rowCount := 2
+			if tc.scrolled {
+				rowCount = 30
+			}
+			prSection.Prs = make([]prrow.Data, 0, rowCount)
+			for index := range rowCount {
+				prSection.Prs = append(prSection.Prs, prrow.Data{
+					Primary: &data.PullRequestData{Number: index + 1, Title: "ticket"},
+				})
 			}
 			prSection.Table.SetRows(prSection.BuildRows())
 
@@ -1726,6 +1746,9 @@ func TestMouseClickSelectsRenderedRow(t *testing.T) {
 			}
 			m.syncMainContentDimensions()
 			m.syncProgramContext()
+			if tc.scrolled {
+				prSection.SetCurrRow(rowCount - 1)
+			}
 
 			_ = m.View()
 			require.Eventually(t, func() bool {
@@ -1733,21 +1756,51 @@ func TestMouseClickSelectsRenderedRow(t *testing.T) {
 			}, 250*time.Millisecond, time.Millisecond)
 			sectionZone := zone.Get("section")
 			itemHeight := 1
-			if !compact {
+			if !tc.compact {
 				itemHeight++
 			}
 			if cfg.Theme.Ui.Table.ShowSeparator {
 				itemHeight++
 			}
+			require.Eventually(t, func() bool {
+				return !zone.Get("section-rows").IsZero()
+			}, 250*time.Millisecond, time.Millisecond)
+			rowsZone := zone.Get("section-rows")
+			if tc.customSpacing {
+				require.NotEqual(
+					t,
+					common.SearchHeight+common.TableHeaderHeight,
+					rowsZone.StartY-sectionZone.StartY,
+				)
+			}
+
+			expectedRow := 1
+			if tc.scrolled {
+				updated, _ := m.Update(tea.MouseClickMsg{
+					X:      rowsZone.StartX,
+					Y:      rowsZone.StartY,
+					Button: tea.MouseLeft,
+				})
+				m = updated.(Model)
+				firstVisibleRow := prSection.CurrRow()
+				require.Greater(t, firstVisibleRow, 0)
+				expectedRow = firstVisibleRow + 1
+
+				_ = m.View()
+				require.Eventually(t, func() bool {
+					return !zone.Get("section-rows").IsZero()
+				}, 250*time.Millisecond, time.Millisecond)
+				rowsZone = zone.Get("section-rows")
+			}
 
 			updated, _ := m.Update(tea.MouseClickMsg{
-				X:      sectionZone.StartX,
-				Y:      sectionZone.StartY + common.SearchHeight + common.TableHeaderHeight + itemHeight,
+				X:      rowsZone.StartX,
+				Y:      rowsZone.StartY + itemHeight,
 				Button: tea.MouseLeft,
 			})
 			m = updated.(Model)
 
-			require.Equal(t, 1, prSection.CurrRow())
+			require.Equal(t, expectedRow, prSection.CurrRow())
 			require.Contains(t, m.footer.View(), prSection.GetPagerContent())
 
 			prSection.SetCurrRow(0)
@@ -1764,7 +1817,7 @@ func TestMouseClickSelectsRenderedRow(t *testing.T) {
 			})
 			m = updated.(Model)
 
-			require.Equal(t, 1, prSection.CurrRow())
+			require.Equal(t, min(3, rowCount-1), prSection.CurrRow())
 			require.Contains(t, m.footer.View(), prSection.GetPagerContent())
 		})
 	}

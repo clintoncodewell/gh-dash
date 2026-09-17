@@ -938,9 +938,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 		}
-		if currSection != nil {
-			_, sectionY := common.MouseZonePosition("section", msg)
-			if row := currSection.RowAtOffset(sectionY); row >= 0 {
+		if currSection != nil && common.MouseZoneInBounds("section-rows", msg) {
+			_, rowY := common.MouseZonePosition("section-rows", msg)
+			if row := currSection.RowAtOffset(rowY); row >= 0 {
 				currSection.SetCurrRow(row)
 				cmd := m.onViewedRowChanged()
 				m.syncMouseState()

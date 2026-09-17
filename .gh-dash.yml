@@ -41,10 +41,17 @@ defaults:
         hidden: true
       base:
         hidden: true
+    issues:
+      creator:
+        hidden: true
+      reactions:
+        hidden: true
+      createdAt:
+        hidden: true
 
   preview:
     open: true
-    width: 0.70
+    width: 0.575
     position: right
   prsLimit: 20
   issuesLimit: 20

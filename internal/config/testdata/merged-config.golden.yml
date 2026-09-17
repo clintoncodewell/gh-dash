@@ -69,14 +69,18 @@ defaults:
         width: 5
       createdAt:
         width: 5
+        hidden: true
       repo:
         width: 15
       creator:
         width: 10
+        hidden: true
       creatorIcon:
         hidden: false
       assignees:
         width: 20
+        hidden: true
+      reactions:
         hidden: true
   refetchIntervalMinutes: 10
 keybindings:

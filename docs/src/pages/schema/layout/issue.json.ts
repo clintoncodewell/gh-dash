@@ -11,14 +11,22 @@ export function GET() {
         updatedAt: {
           width: 7,
         },
+        createdAt: {
+          width: 5,
+          hidden: true,
+        },
         repo: {
           width: 15,
         },
         creator: {
           width: 10,
+          hidden: true,
         },
         assignees: {
           width: 20,
+          hidden: true,
+        },
+        reactions: {
           hidden: true,
         },
       },
@@ -35,6 +43,21 @@ export function GET() {
           ],
           default: {
             width: 7,
+          },
+        },
+        createdAt: {
+          title: "Issue Created At Column",
+          description:
+            "Defines options for the created at column in an issue section.",
+          type: "object",
+          oneOf: [
+            {
+              $ref: "./options.json",
+            },
+          ],
+          default: {
+            width: 5,
+            hidden: true,
           },
         },
         state: {
@@ -85,6 +108,7 @@ export function GET() {
           ],
           default: {
             width: 10,
+            hidden: true,
           },
         },
         creatorIcon: {
@@ -137,6 +161,9 @@ export function GET() {
               $ref: "./options.json",
             },
           ],
+          default: {
+            hidden: true,
+          },
         },
       },
     }),

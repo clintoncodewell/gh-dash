@@ -350,7 +350,7 @@ func (parser ConfigParser) getDefaultConfig() Config {
 		Defaults: Defaults{
 			Preview: PreviewConfig{
 				Open:     true,
-				Width:    0.70,
+				Width:    0.575,
 				Height:   0.60,
 				Position: "right",
 			},
@@ -398,19 +398,24 @@ func (parser ConfigParser) getDefaultConfig() Config {
 						Width: utils.IntPtr(lipgloss.Width("2mo  ")),
 					},
 					CreatedAt: ColumnConfig{
-						Width: utils.IntPtr(lipgloss.Width("2mo  ")),
+						Width:  utils.IntPtr(lipgloss.Width("2mo  ")),
+						Hidden: utils.BoolPtr(true),
 					},
 					Repo: ColumnConfig{
 						Width: utils.IntPtr(15),
 					},
 					Creator: ColumnConfig{
-						Width: utils.IntPtr(10),
+						Width:  utils.IntPtr(10),
+						Hidden: utils.BoolPtr(true),
 					},
 					CreatorIcon: ColumnConfig{
 						Hidden: utils.BoolPtr(false),
 					},
 					Assignees: ColumnConfig{
 						Width:  utils.IntPtr(20),
+						Hidden: utils.BoolPtr(true),
+					},
+					Reactions: ColumnConfig{
 						Hidden: utils.BoolPtr(true),
 					},
 				},
