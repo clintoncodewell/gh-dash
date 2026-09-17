@@ -1,0 +1,60 @@
+internal/tui/ui.go
+  s_b6764596f3920a::t_c0d87dd42cb409 941-943
+internal/config/testdata/merged-config.golden.yml
+  s_b6764596f3920a::t_e9d7be7959ccba 72,77,83-84
+internal/tui/components/table/table.go
+  s_b6764596f3920a::t_c0d87dd42cb409 315
+internal/tui/components/section/section.go
+  s_b6764596f3920a::t_c0d87dd42cb409 218
+internal/tui/ui_test.go
+  s_b6764596f3920a::t_c0d87dd42cb409 1765-1768,1797-1798
+  s_b6764596f3920a::t_a7493e4d3e4abb 1680-1683,1685-1688,1690-1691,1700,1710-1713,1759
+  s_b6764596f3920a::t_263d12a39af353 1769-1794,1803
+  s_b6764596f3920a::t_6e41e83ab38d8d 1820
+  s_b6764596f3920a::t_447a874e82fffd 1684,1689,1722-1730,1749-1751
+internal/config/testdata/global-config.golden.yml
+  s_b6764596f3920a::t_e9d7be7959ccba 81,86,92-93
+docs/src/pages/schema/layout/issue.json.ts
+  s_b6764596f3920a::t_e9d7be7959ccba 14,16-17,23,29-31,48-51,58,60-62,111,164-166
+  s_b6764596f3920a::t_dd3b583bb927f3 15,59
+  s_06d17752177bd5::t_cc74070b2dbe29 52-57
+internal/config/parser_test.go
+  s_b6764596f3920a::t_14973366b319bf 48-72,93,95-97
+docs/src/content/docs/configuration/layout/issue.mdx
+  s_b6764596f3920a::t_dd3b583bb927f3 59,81-83,136-137,174-175
+  s_b6764596f3920a::t_b2f3efdc0169b5 124
+  s_b6764596f3920a::t_e9d7be7959ccba 29,32,34,55,57-58,60-61,79-80,84-86,138,176
+  s_06d17752177bd5::t_c62e6854fdca2f 87
+.gh-dash.yml
+  s_06d17752177bd5::t_e3967816032d1d 44-50,54
+docs/src/content/docs/configuration/defaults.mdx
+  s_06d17752177bd5::t_41c02a2814deac 17,27,155,159
+docs/src/pages/schema/defaults.json.ts
+  s_06d17752177bd5::t_bd8aa118a8da32 12,70
+internal/config/parser.go
+  s_06d17752177bd5::t_d114213095a464 353,401-402,408-409,418-420
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "43f88aac857a147017e115d36b31b7d03a28f799",
+  "prompts": {},
+  "sessions": {
+    "s_06d17752177bd5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0adf9-57ec-7de0-a953-e528401deb6a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_b6764596f3920a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ade9-0459-7c82-87cf-79aca8f48ee6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    }
+  }
+}
