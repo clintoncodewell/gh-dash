@@ -30,7 +30,9 @@ func InitializeMarkdownStyle(ctx *context.ProgramContext) {
 	if hasDarkBackground {
 		markdownStyle = &CustomDarkStyleConfig
 	} else {
-		markdownStyle = &styles.LightStyleConfig
+		lightStyle := styles.LightStyleConfig
+		lightStyle.List.Indent = uintPtr(2)
+		markdownStyle = &lightStyle
 	}
 	markdownStyleSource = backgroundSource
 

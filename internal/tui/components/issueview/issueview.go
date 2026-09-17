@@ -217,8 +217,7 @@ func (m *Model) renderBody() string {
 	// Strip HTML comments from body and cleanup body.
 	body := htmlCommentRegex.ReplaceAllString(m.issue.Data.Body, "")
 	body = lineCleanupRegex.ReplaceAllString(body, "")
-
-	body = strings.TrimSpace(body)
+	body = markdown.NormalizeBody(body)
 	if body == "" {
 		return lipgloss.NewStyle().
 			Italic(true).
@@ -231,6 +230,7 @@ func (m *Model) renderBody() string {
 	if err != nil {
 		return ""
 	}
+	rendered = markdown.AlignWrappedBullets(rendered)
 
 	return lipgloss.NewStyle().
 		Width(width).

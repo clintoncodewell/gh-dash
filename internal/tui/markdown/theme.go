@@ -30,6 +30,9 @@ var CustomDarkStyleConfig = ansi.StyleConfig{
 		IndentToken:    stringPtr("│ "),
 	},
 	List: ansi.StyleList{
+		StyleBlock: ansi.StyleBlock{
+			Indent: uintPtr(2),
+		},
 		LevelIndent: 2,
 	},
 	Heading: ansi.StyleBlock{

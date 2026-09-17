@@ -48,6 +48,7 @@ func NewModel(ctx *context.ProgramContext) Model {
 	c := carousel.New(
 		carousel.WithItems(tabs),
 		carousel.WithWidth(ctx.MainContentWidth),
+		carousel.WithZonePrefix("pr-tab"),
 	)
 
 	ta := inputbox.DefaultTextArea(ctx)
@@ -498,6 +499,7 @@ func (m *Model) renderSummary() string {
 	// Strip HTML comments from body and cleanup body.
 	body := htmlCommentRegex.ReplaceAllString(m.pr.Data.Enriched.Body, "")
 	body = lineCleanupRegex.ReplaceAllString(body, "")
+	body = markdown.NormalizeBody(body)
 
 	desc := m.ctx.Styles.Common.MainTextStyle.Bold(true).Underline(true).Render(" Summary")
 	title := lipgloss.JoinVertical(
@@ -506,7 +508,6 @@ func (m *Model) renderSummary() string {
 		"",
 	)
 	sbody := lipgloss.NewStyle().Width(m.getIndentedContentWidth())
-	body = strings.TrimSpace(body)
 	if body == "" {
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
@@ -520,6 +521,7 @@ func (m *Model) renderSummary() string {
 	if err != nil {
 		return ""
 	}
+	rendered = markdown.AlignWrappedBullets(rendered)
 
 	bodyHeight := lipgloss.Height(rendered)
 	if !m.summaryViewMore && bodyHeight > foldBodyHeight {
@@ -527,7 +529,7 @@ func (m *Model) renderSummary() string {
 		rendered = lipgloss.JoinVertical(lipgloss.Left,
 			rendered,
 			"",
-			lipgloss.PlaceHorizontal(m.getIndentedContentWidth(), lipgloss.Center,
+			common.MarkMouseZone("summary-more", lipgloss.PlaceHorizontal(m.getIndentedContentWidth(), lipgloss.Center,
 				lipgloss.JoinHorizontal(
 					lipgloss.Top,
 					lipgloss.NewStyle().Bold(true).Italic(true).Render("Press "),
@@ -537,7 +539,7 @@ func (m *Model) renderSummary() string {
 						Render("e"),
 					lipgloss.NewStyle().Bold(true).Italic(true).Render(" to read more..."),
 				),
-			),
+			)),
 		)
 	}
 
@@ -755,6 +757,14 @@ func (m *Model) GoToFirstTab() {
 
 func (m *Model) GoToActivityTab() {
 	m.carousel.SetCursor(1) // Activity is the second tab (index 1)
+}
+
+func (m *Model) SetSelectedTab(index int) {
+	m.carousel.SetCursor(index)
+}
+
+func (m Model) TabCount() int {
+	return len(tabs)
 }
 
 func (m Model) SelectedTab() string {

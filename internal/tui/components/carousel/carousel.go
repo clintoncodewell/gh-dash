@@ -1,11 +1,14 @@
 package carousel
 
 import (
+	"fmt"
+
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/common"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/constants"
 )
 
@@ -23,6 +26,7 @@ type Model struct {
 	rightOverflowIndicator string
 	showSeparators         bool
 	separator              string
+	zonePrefix             string
 	styles                 Styles
 
 	content string
@@ -144,6 +148,14 @@ func WithSeparators(sep ...string) Option {
 		if len(sep) > 0 {
 			m.separator = sep[0]
 		}
+	}
+}
+
+// WithZonePrefix makes each visible item mouse-addressable as
+// "<prefix>-<item index>".
+func WithZonePrefix(prefix string) Option {
+	return func(m *Model) {
+		m.zonePrefix = prefix
 	}
 }
 
@@ -373,6 +385,10 @@ func (m *Model) renderItem(itemID int, maxWidth int) string {
 	} else {
 		r := m.styles.Item.Render(m.items[itemID])
 		item = ansi.Truncate(r, maxWidth, m.styles.Item.Inline(true).Render(constants.Ellipsis))
+	}
+
+	if m.zonePrefix != "" {
+		item = common.MarkMouseZone(fmt.Sprintf("%s-%d", m.zonePrefix, itemID), item)
 	}
 
 	if m.showSeparators && itemID != len(m.items)-1 {

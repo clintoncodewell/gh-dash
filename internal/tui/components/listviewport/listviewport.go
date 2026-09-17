@@ -87,6 +87,36 @@ func (m *Model) GetCurrItem() int {
 	return m.currId
 }
 
+func (m *Model) SetCurrItem(item int) int {
+	if m.NumCurrentItems == 0 {
+		m.currId = 0
+		return m.currId
+	}
+
+	m.currId = min(max(item, 0), m.NumCurrentItems-1)
+	itemsPerPage := max(m.getNumPrsPerPage(), 1)
+	if m.currId < m.topBoundId {
+		m.topBoundId = m.currId
+	} else if m.currId > m.bottomBoundId {
+		m.topBoundId = m.currId - itemsPerPage + 1
+	}
+	m.topBoundId = max(m.topBoundId, 0)
+	m.bottomBoundId = min(m.topBoundId+itemsPerPage-1, m.NumCurrentItems-1)
+	m.viewport.SetYOffset(m.topBoundId * m.ListItemHeight)
+	return m.currId
+}
+
+func (m *Model) ItemAtOffset(offset int) int {
+	if offset < 0 || offset >= m.viewport.Height() || m.ListItemHeight <= 0 {
+		return -1
+	}
+	item := m.topBoundId + offset/m.ListItemHeight
+	if item < 0 || item >= m.NumCurrentItems {
+		return -1
+	}
+	return item
+}
+
 func (m *Model) NextItem() int {
 	atBottomOfViewport := m.currId >= m.bottomBoundId
 	if atBottomOfViewport {

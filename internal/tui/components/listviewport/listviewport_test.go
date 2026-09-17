@@ -1,6 +1,7 @@
 package listviewport
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -127,5 +128,65 @@ func TestNextItemAtLastItem(t *testing.T) {
 
 	if m.GetCurrItem() != 9 {
 		t.Errorf("expected currId=9, got %d", m.GetCurrItem())
+	}
+}
+
+func TestSetCurrItemClampsAndScrollsIntoView(t *testing.T) {
+	m := newTestModel(testModelOpts{numItems: 10, viewportHeight: 5, itemHeight: 1})
+	m.SyncViewPort(strings.Repeat("item\n", 10))
+
+	if got := m.SetCurrItem(8); got != 8 {
+		t.Fatalf("expected selected item 8, got %d", got)
+	}
+	if m.topBoundId != 4 || m.bottomBoundId != 8 {
+		t.Fatalf("expected visible bounds 4..8, got %d..%d", m.topBoundId, m.bottomBoundId)
+	}
+	if got := m.viewport.YOffset(); got != 4 {
+		t.Fatalf("expected viewport offset 4, got %d", got)
+	}
+
+	if got := m.SetCurrItem(-3); got != 0 {
+		t.Fatalf("expected negative selection to clamp to 0, got %d", got)
+	}
+	if m.topBoundId != 0 || m.bottomBoundId != 4 {
+		t.Fatalf("expected visible bounds 0..4, got %d..%d", m.topBoundId, m.bottomBoundId)
+	}
+
+	if got := m.SetCurrItem(99); got != 9 {
+		t.Fatalf("expected oversized selection to clamp to 9, got %d", got)
+	}
+	if m.topBoundId != 5 || m.bottomBoundId != 9 {
+		t.Fatalf("expected visible bounds 5..9, got %d..%d", m.topBoundId, m.bottomBoundId)
+	}
+}
+
+func TestSetCurrItemEmptyList(t *testing.T) {
+	m := newTestModel(testModelOpts{numItems: 0, viewportHeight: 5, itemHeight: 1})
+
+	if got := m.SetCurrItem(4); got != 0 {
+		t.Fatalf("expected empty list selection to remain 0, got %d", got)
+	}
+}
+
+func TestItemAtOffsetUsesVisiblePageAndItemHeight(t *testing.T) {
+	m := newTestModel(testModelOpts{numItems: 10, viewportHeight: 6, itemHeight: 2})
+	m.SetCurrItem(5)
+
+	tests := []struct {
+		offset int
+		want   int
+	}{
+		{offset: -1, want: -1},
+		{offset: 0, want: 3},
+		{offset: 1, want: 3},
+		{offset: 2, want: 4},
+		{offset: 5, want: 5},
+		{offset: 6, want: -1},
+	}
+
+	for _, tt := range tests {
+		if got := m.ItemAtOffset(tt.offset); got != tt.want {
+			t.Errorf("ItemAtOffset(%d) = %d, want %d", tt.offset, got, tt.want)
+		}
 	}
 }

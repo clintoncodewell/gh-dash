@@ -34,6 +34,7 @@ func NewModel(ctx *context.ProgramContext) Model {
 		carousel.WithHeight(1),
 		carousel.WithOverflowIndicators("←", "→"),
 		carousel.WithSeparators(),
+		carousel.WithZonePrefix("section-tab"),
 	)
 	m := Model{
 		carousel: c,

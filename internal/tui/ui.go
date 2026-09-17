@@ -311,10 +311,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case key.Matches(msg, m.keys.RefreshAll):
-			data.ClearEnrichmentCache()
-			newSections, fetchSectionsCmds := m.fetchAllViewSections()
-			m.setCurrentViewSections(newSections)
-			cmds = append(cmds, fetchSectionsCmds)
+			cmds = append(cmds, m.refreshAllSections())
 
 		case key.Matches(msg, m.keys.Redraw):
 			// with bubbletea v2's declarative approach, if we just clear the screen then tea will redraw for us
@@ -830,11 +827,101 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, currSection.FetchNextPageSectionRows()...)
 		}
 
+	case tea.MouseWheelMsg:
+		if m.sidebar.IsOpen && common.MouseZoneInBounds("sidebar", msg) {
+			m.sidebar, sidebarCmd = m.sidebar.Update(msg)
+			return m, sidebarCmd
+		}
+		if m.mouseNavigationBlocked(currSection) {
+			return m, nil
+		}
+		if currSection != nil && common.MouseZoneInBounds("section", msg) {
+			previousRow := currSection.CurrRow()
+			for range 3 {
+				switch msg.Button {
+				case tea.MouseWheelDown:
+					currSection.NextRow()
+				case tea.MouseWheelUp:
+					currSection.PrevRow()
+				}
+			}
+			if previousRow != currSection.CurrRow() {
+				if msg.Button == tea.MouseWheelDown && currSection.CurrRow() == currSection.NumRows()-1 &&
+					m.ctx.View != config.RepoView {
+					cmds = append(cmds, currSection.FetchNextPageSectionRows()...)
+				}
+				cmds = append(cmds, m.onViewedRowChanged())
+			}
+			m.syncMouseState()
+			return m, tea.Batch(cmds...)
+		}
+		return m, nil
+
 	case tea.MouseClickMsg:
 		if msg.Button != tea.MouseLeft {
 			return m, nil
 		}
-		if zone.Get("donate").InBounds(msg) {
+		if m.mouseNavigationBlocked(currSection) {
+			return m, nil
+		}
+		if common.MouseZoneInBounds("refresh-all", msg) {
+			cmd := m.refreshAllSections()
+			m.syncMouseState()
+			return m, cmd
+		}
+		if common.MouseZoneInBounds("help", msg) {
+			m.footer.ShowAll = !m.footer.ShowAll
+			m.syncMainContentDimensions()
+			m.syncMouseState()
+			return m, nil
+		}
+		for _, view := range []config.ViewType{
+			config.NotificationsView,
+			config.PRsView,
+			config.IssuesView,
+		} {
+			if common.MouseZoneInBounds("view-"+view.String(), msg) {
+				cmd := m.selectView(view)
+				m.syncMouseState()
+				return m, cmd
+			}
+		}
+		for index, currentSection := range m.getCurrentViewSections() {
+			if common.MouseZoneInBounds(fmt.Sprintf("section-tab-%d", index), msg) {
+				m.setCurrSectionId(currentSection.GetId())
+				cmd := m.onViewedRowChanged()
+				m.syncMouseState()
+				return m, cmd
+			}
+		}
+		showingPRPreview := m.ctx.View == config.PRsView ||
+			(m.ctx.View == config.NotificationsView && m.notificationView.GetSubjectPR() != nil)
+		if showingPRPreview && m.sidebar.IsOpen {
+			for tabIndex := range m.prView.TabCount() {
+				if common.MouseZoneInBounds(fmt.Sprintf("pr-tab-%d", tabIndex), msg) {
+					m.prView.SetSelectedTab(tabIndex)
+					m.syncSidebar()
+					m.syncMouseState()
+					return m, nil
+				}
+			}
+			if common.MouseZoneInBounds("summary-more", msg) {
+				m.prView.SetSummaryViewMore()
+				m.syncSidebar()
+				m.syncMouseState()
+				return m, nil
+			}
+		}
+		if currSection != nil {
+			_, sectionY := common.MouseZonePosition("section", msg)
+			if row := currSection.RowAtOffset(sectionY); row >= 0 {
+				currSection.SetCurrRow(row)
+				cmd := m.onViewedRowChanged()
+				m.syncMouseState()
+				return m, cmd
+			}
+		}
+		if common.MouseZoneInBounds("donate", msg) {
 			log.Info("Donate clicked", "msg", msg)
 			openCmd := func() tea.Msg {
 				// Discard the launcher's stdout/stderr so any noise (e.g.
@@ -848,7 +935,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				return nil
 			}
-			cmds = append(cmds, openCmd)
+			return m, openCmd
 		}
 
 	case tea.WindowSizeMsg:
@@ -943,17 +1030,22 @@ func (m Model) View() tea.View {
 	content := "No sections defined"
 	currSection := m.getCurrSection()
 	if currSection != nil {
+		sectionView := common.MarkMouseZone("section", m.getCurrSection().View())
+		sidebarView := m.sidebar.View()
+		if m.sidebar.IsOpen {
+			sidebarView = common.MarkMouseZone("sidebar", sidebarView)
+		}
 		if m.ctx.PreviewPosition == "bottom" && m.sidebar.IsOpen {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
-				m.getCurrSection().View(),
-				m.sidebar.View(),
+				sectionView,
+				sidebarView,
 			)
 		} else {
 			content = lipgloss.JoinHorizontal(
 				lipgloss.Top,
-				m.getCurrSection().View(),
-				m.sidebar.View(),
+				sectionView,
+				sidebarView,
 			)
 		}
 	}
@@ -1628,6 +1720,33 @@ func (m *Model) setCurrentViewSections(newSections []section.Section) {
 
 func (m *Model) switchSelectedView() tea.Cmd {
 	repoFF := config.IsFeatureEnabled(config.FF_REPO_VIEW)
+	nextView := config.NotificationsView
+
+	if repoFF {
+		switch m.ctx.View {
+		case config.NotificationsView:
+			nextView = config.PRsView
+		case config.PRsView:
+			nextView = config.IssuesView
+		case config.IssuesView:
+			nextView = config.RepoView
+		}
+	} else {
+		switch m.ctx.View {
+		case config.NotificationsView:
+			nextView = config.PRsView
+		case config.PRsView:
+			nextView = config.IssuesView
+		}
+	}
+
+	return m.selectView(nextView)
+}
+
+func (m *Model) selectView(view config.ViewType) tea.Cmd {
+	if m.ctx.View == view {
+		return nil
+	}
 
 	// Reset notification subject when leaving notifications view
 	if m.ctx.View == config.NotificationsView {
@@ -1635,28 +1754,7 @@ func (m *Model) switchSelectedView() tea.Cmd {
 		m.notificationView.ClearSubject()
 	}
 
-	// View cycle: Notifications → PRs → Issues (→ Repo if enabled) → Notifications
-	if repoFF {
-		switch m.ctx.View {
-		case config.NotificationsView:
-			m.ctx.View = config.PRsView
-		case config.PRsView:
-			m.ctx.View = config.IssuesView
-		case config.IssuesView:
-			m.ctx.View = config.RepoView
-		case config.RepoView:
-			m.ctx.View = config.NotificationsView
-		}
-	} else {
-		switch m.ctx.View {
-		case config.NotificationsView:
-			m.ctx.View = config.PRsView
-		case config.PRsView:
-			m.ctx.View = config.IssuesView
-		default:
-			m.ctx.View = config.NotificationsView
-		}
-	}
+	m.ctx.View = view
 
 	m.syncMainContentDimensions()
 	m.setCurrSectionId(m.getCurrentViewDefaultSection())
@@ -1673,6 +1771,35 @@ func (m *Model) switchSelectedView() tea.Cmd {
 	cmds = append(cmds, m.onViewedRowChanged())
 
 	return tea.Batch(cmds...)
+}
+
+func (m *Model) refreshAllSections() tea.Cmd {
+	data.ClearEnrichmentCache()
+	newSections, fetchSectionsCmds := m.fetchAllViewSections()
+	m.setCurrentViewSections(newSections)
+	return fetchSectionsCmds
+}
+
+func (m *Model) mouseNavigationBlocked(currSection section.Section) bool {
+	return (currSection != nil && (currSection.IsSearchFocused() ||
+		currSection.IsPromptConfirmationFocused())) ||
+		m.prView.IsTextInputBoxFocused() ||
+		m.issueSidebar.IsTextInputBoxFocused() ||
+		m.footer.ShowConfirmQuit ||
+		m.notificationView.HasPendingAction()
+}
+
+func (m *Model) syncMouseState() {
+	m.syncProgramContext()
+	currSection := m.getCurrSection()
+	if currSection == nil {
+		return
+	}
+	if currSection.IsPromptConfirmationFocused() {
+		m.footer.SetLeftSection(currSection.GetPromptConfirmation())
+	} else {
+		m.footer.SetLeftSection(currSection.GetPagerContent())
+	}
 }
 
 func (m *Model) isUserDefinedKeybinding(msg tea.KeyMsg) bool {

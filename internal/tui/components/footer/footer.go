@@ -8,10 +8,10 @@ import (
 	bbHelp "charm.land/bubbles/v2/help"
 	"charm.land/lipgloss/v2"
 	"charm.land/lipgloss/v2/compat"
-	zone "github.com/lrstanley/bubblezone/v2"
 
 	"github.com/dlvhdr/gh-dash/v4/internal/config"
 	"github.com/dlvhdr/gh-dash/v4/internal/git"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/common"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/constants"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/context"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/keys"
@@ -50,12 +50,17 @@ func (m Model) View() string {
 		footer = lipgloss.NewStyle().
 			Render("Really quit? (Press y/enter to confirm, any other key to cancel)")
 	} else {
-		helpIndicator := lipgloss.NewStyle().
+		helpIndicator := common.MarkMouseZone("help", lipgloss.NewStyle().
 			Background(m.ctx.Theme.FaintText).
 			Foreground(m.ctx.Theme.SelectedBackground).
 			Padding(0, 1).
-			Render("? help")
-		donationIndicator := zone.Mark("donate", lipgloss.NewStyle().
+			Render("? help"))
+		refreshIndicator := common.MarkMouseZone("refresh-all", lipgloss.NewStyle().
+			Background(m.ctx.Theme.SelectedBackground).
+			Foreground(m.ctx.Theme.SecondaryText).
+			Padding(0, 1).
+			Render("↻ R"))
+		donationIndicator := common.MarkMouseZone("donate", lipgloss.NewStyle().
 			Background(m.ctx.Theme.SelectedBackground).
 			Foreground(m.ctx.Theme.WarningText).
 			Padding(0, 1).
@@ -76,18 +81,17 @@ func (m Model) View() string {
 				strings.Repeat(
 					" ",
 					utils.Max(0,
-						m.ctx.ScreenWidth-lipgloss.Width(
-							viewSwitcher,
-						)-lipgloss.Width(leftSection)-
+						m.ctx.ScreenWidth-lipgloss.Width(viewSwitcher)-
+							lipgloss.Width(leftSection)-
 							lipgloss.Width(rightSection)-
-							lipgloss.Width(
-								helpIndicator,
-							)-lipgloss.Width(donationIndicator),
+							lipgloss.Width(helpIndicator)-
+							lipgloss.Width(donationIndicator)-
+							lipgloss.Width(refreshIndicator),
 					)))
 
 		footer = m.ctx.Styles.Common.FooterStyle.
 			Render(lipgloss.JoinHorizontal(lipgloss.Top, viewSwitcher, leftSection, spacing,
-				rightSection, donationIndicator, helpIndicator))
+				rightSection, refreshIndicator, donationIndicator, helpIndicator))
 	}
 
 	if m.ShowAll {
@@ -137,6 +141,7 @@ func (m *Model) renderViewButton(view config.ViewType) string {
 		label = " Issues"
 	}
 
+	zoneID := "view-" + view.String()
 	if isActive {
 		// Active: colored icon + prominent background
 		// Use gold for notifications bell, green for others
@@ -152,13 +157,13 @@ func (m *Model) renderViewButton(view config.ViewType) string {
 			Background(m.ctx.Styles.ViewSwitcher.ActiveView.GetBackground()).
 			Bold(true)
 		if label != "" {
-			return activeStyle.Render(icon) + activeStyle.Render(label)
+			return common.MarkMouseZone(zoneID, activeStyle.Render(icon)+activeStyle.Render(label))
 		}
-		return activeStyle.Render(icon)
+		return common.MarkMouseZone(zoneID, activeStyle.Render(icon))
 	}
 
 	// Inactive: faint styling
-	return m.ctx.Styles.ViewSwitcher.InactiveView.Render(icon + label)
+	return common.MarkMouseZone(zoneID, m.ctx.Styles.ViewSwitcher.InactiveView.Render(icon+label))
 }
 
 func (m *Model) renderViewSwitcher(ctx *context.ProgramContext) string {

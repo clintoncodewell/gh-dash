@@ -19,6 +19,7 @@ import (
 
 	"github.com/dlvhdr/gh-dash/v4/internal/config"
 	"github.com/dlvhdr/gh-dash/v4/internal/data"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/common"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/branchsidebar"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/footer"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/issueview"
@@ -1337,6 +1338,237 @@ func TestView_ClosingSidebarFromBottomMode_NoExtraLine(t *testing.T) {
 
 	require.Equal(t, rightClosedLines, bottomClosedLines,
 		"closing sidebar from bottom mode should produce the same number of lines as right mode")
+}
+
+func TestMouseWheelOverPreviewScrollsSidebar(t *testing.T) {
+	zone.NewGlobal()
+	zone.SetEnabled(true)
+
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	cfg.Defaults.Preview.Open = true
+	cfg.Defaults.Preview.Width = 0.45
+	cfg.Defaults.Preview.Position = "right"
+
+	ctx := &context.ProgramContext{
+		Config:       &cfg,
+		ScreenWidth:  120,
+		ScreenHeight: 40,
+		View:         config.PRsView,
+		StartTask:    func(task context.Task) tea.Cmd { return nil },
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+
+	prSection := prssection.NewModel(
+		0,
+		ctx,
+		config.PrsSectionConfig{Title: "Test", Filters: "is:open"},
+		time.Now(),
+		time.Now(),
+	)
+	m := Model{
+		ctx:              ctx,
+		keys:             keys.Keys,
+		prs:              []section.Section{&prSection},
+		currSectionId:    0,
+		sidebar:          sidebar.NewModel(),
+		footer:           footer.NewModel(ctx),
+		tabs:             tabs.NewModel(ctx),
+		prView:           prview.NewModel(ctx),
+		issueSidebar:     issueview.NewModel(ctx),
+		branchSidebar:    branchsidebar.NewModel(ctx),
+		notificationView: notificationview.NewModel(ctx),
+	}
+	m.sidebar.IsOpen = true
+	m.syncMainContentDimensions()
+	m.sidebar.UpdateProgramContext(ctx)
+	m.sidebar.SetContent(strings.Repeat("preview line\n", 100))
+
+	_ = m.View()
+	require.Eventually(t, func() bool {
+		return !zone.Get("sidebar").IsZero()
+	}, 250*time.Millisecond, time.Millisecond)
+	previewZone := zone.Get("sidebar")
+
+	updated, _ := m.Update(tea.MouseWheelMsg{
+		X:      previewZone.StartX,
+		Y:      previewZone.StartY,
+		Button: tea.MouseWheelDown,
+	})
+	m = updated.(Model)
+
+	require.Greater(t, m.sidebar.YOffset(), 0)
+}
+
+func TestMouseNavigationDoesNotChangeRowDuringConfirmation(t *testing.T) {
+	zone.NewGlobal()
+	zone.SetEnabled(true)
+
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	ctx := &context.ProgramContext{
+		Config:       &cfg,
+		ScreenWidth:  120,
+		ScreenHeight: 40,
+		View:         config.PRsView,
+		StartTask:    func(task context.Task) tea.Cmd { return nil },
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+
+	prSection := prssection.NewModel(
+		0,
+		ctx,
+		config.PrsSectionConfig{Title: "Test", Filters: "is:open"},
+		time.Now(),
+		time.Now(),
+	)
+	prSection.Prs = []prrow.Data{
+		{Primary: &data.PullRequestData{Number: 1, Title: "first"}},
+		{Primary: &data.PullRequestData{Number: 2, Title: "second"}},
+	}
+	prSection.Table.SetRows(prSection.BuildRows())
+	prSection.SetCurrRow(1)
+	prSection.SetIsPromptConfirmationShown(true)
+
+	m := Model{
+		ctx:              ctx,
+		keys:             keys.Keys,
+		prs:              []section.Section{&prSection},
+		currSectionId:    0,
+		sidebar:          sidebar.NewModel(),
+		footer:           footer.NewModel(ctx),
+		tabs:             tabs.NewModel(ctx),
+		prView:           prview.NewModel(ctx),
+		issueSidebar:     issueview.NewModel(ctx),
+		branchSidebar:    branchsidebar.NewModel(ctx),
+		notificationView: notificationview.NewModel(ctx),
+	}
+	m.syncMainContentDimensions()
+	m.syncProgramContext()
+
+	_ = m.View()
+	require.Eventually(t, func() bool {
+		return !zone.Get("section").IsZero()
+	}, 250*time.Millisecond, time.Millisecond)
+	sectionZone := zone.Get("section")
+
+	updated, _ := m.Update(tea.MouseWheelMsg{
+		X:      sectionZone.StartX,
+		Y:      sectionZone.StartY,
+		Button: tea.MouseWheelUp,
+	})
+	m = updated.(Model)
+	require.Equal(t, 1, prSection.CurrRow())
+
+	updated, _ = m.Update(tea.MouseClickMsg{
+		X:      sectionZone.StartX,
+		Y:      sectionZone.StartY + common.SearchHeight + common.TableHeaderHeight,
+		Button: tea.MouseLeft,
+	})
+	m = updated.(Model)
+	require.Equal(t, 1, prSection.CurrRow())
+}
+
+func TestMouseClickSelectsRenderedRow(t *testing.T) {
+	for _, compact := range []bool{true, false} {
+		t.Run(map[bool]string{true: "compact", false: "comfortable"}[compact], func(t *testing.T) {
+			zone.NewGlobal()
+			zone.SetEnabled(true)
+
+			cfg, err := config.ParseConfig(config.Location{
+				ConfigFlag:       "../config/testdata/test-config.yml",
+				SkipGlobalConfig: true,
+			})
+			require.NoError(t, err)
+			cfg.Theme.Ui.Table.Compact = compact
+			ctx := &context.ProgramContext{
+				Config:       &cfg,
+				ScreenWidth:  120,
+				ScreenHeight: 40,
+				View:         config.PRsView,
+				StartTask:    func(task context.Task) tea.Cmd { return nil },
+			}
+			ctx.Theme = theme.ParseTheme(ctx.Config)
+			ctx.Styles = context.InitStyles(ctx.Theme)
+
+			prSection := prssection.NewModel(
+				0,
+				ctx,
+				config.PrsSectionConfig{Title: "Test", Filters: "is:open"},
+				time.Now(),
+				time.Now(),
+			)
+			prSection.Prs = []prrow.Data{
+				{Primary: &data.PullRequestData{Number: 1, Title: "first"}},
+				{Primary: &data.PullRequestData{Number: 2, Title: "second"}},
+			}
+			prSection.Table.SetRows(prSection.BuildRows())
+
+			m := Model{
+				ctx:              ctx,
+				keys:             keys.Keys,
+				prs:              []section.Section{&prSection},
+				currSectionId:    0,
+				sidebar:          sidebar.NewModel(),
+				footer:           footer.NewModel(ctx),
+				tabs:             tabs.NewModel(ctx),
+				prView:           prview.NewModel(ctx),
+				issueSidebar:     issueview.NewModel(ctx),
+				branchSidebar:    branchsidebar.NewModel(ctx),
+				notificationView: notificationview.NewModel(ctx),
+			}
+			m.syncMainContentDimensions()
+			m.syncProgramContext()
+
+			_ = m.View()
+			require.Eventually(t, func() bool {
+				return !zone.Get("section").IsZero()
+			}, 250*time.Millisecond, time.Millisecond)
+			sectionZone := zone.Get("section")
+			itemHeight := 1
+			if !compact {
+				itemHeight++
+			}
+			if cfg.Theme.Ui.Table.ShowSeparator {
+				itemHeight++
+			}
+
+			updated, _ := m.Update(tea.MouseClickMsg{
+				X:      sectionZone.StartX,
+				Y:      sectionZone.StartY + common.SearchHeight + common.TableHeaderHeight + itemHeight,
+				Button: tea.MouseLeft,
+			})
+			m = updated.(Model)
+
+			require.Equal(t, 1, prSection.CurrRow())
+			require.Contains(t, m.footer.View(), prSection.GetPagerContent())
+
+			prSection.SetCurrRow(0)
+			m.syncMouseState()
+			_ = m.View()
+			require.Eventually(t, func() bool {
+				return !zone.Get("section").IsZero()
+			}, 250*time.Millisecond, time.Millisecond)
+			sectionZone = zone.Get("section")
+			updated, _ = m.Update(tea.MouseWheelMsg{
+				X:      sectionZone.StartX,
+				Y:      sectionZone.StartY,
+				Button: tea.MouseWheelDown,
+			})
+			m = updated.(Model)
+
+			require.Equal(t, 1, prSection.CurrRow())
+			require.Contains(t, m.footer.View(), prSection.GetPagerContent())
+		})
+	}
 }
 
 func TestPromptConfirmationForNotificationPR(t *testing.T) {

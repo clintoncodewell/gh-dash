@@ -36,6 +36,7 @@ func NewModel() Model {
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -45,9 +46,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case key.Matches(msg, keys.Keys.PageUp):
 			m.viewport.HalfPageUp()
 		}
+	case tea.MouseWheelMsg:
+		m.viewport, cmd = m.viewport.Update(msg)
 	}
 
-	return m, nil
+	return m, cmd
 }
 
 func (m Model) View() string {

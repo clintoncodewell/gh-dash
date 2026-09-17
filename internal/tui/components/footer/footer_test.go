@@ -1,0 +1,46 @@
+package footer
+
+import (
+	"testing"
+	"time"
+
+	zone "github.com/lrstanley/bubblezone/v2"
+	"github.com/stretchr/testify/require"
+
+	"github.com/dlvhdr/gh-dash/v4/internal/config"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/context"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/theme"
+)
+
+func TestViewMarksRefreshAndViewControls(t *testing.T) {
+	zone.NewGlobal()
+	zone.SetEnabled(true)
+
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../../../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	ctx := &context.ProgramContext{
+		Config:      &cfg,
+		ScreenWidth: 160,
+		View:        config.PRsView,
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+
+	m := NewModel(ctx)
+	zone.Scan(m.View())
+
+	for _, id := range []string{
+		"refresh-all",
+		"help",
+		"view-notifications",
+		"view-prs",
+		"view-issues",
+	} {
+		require.Eventually(t, func() bool {
+			return !zone.Get(id).IsZero()
+		}, 250*time.Millisecond, time.Millisecond, "expected mouse zone %q", id)
+	}
+}

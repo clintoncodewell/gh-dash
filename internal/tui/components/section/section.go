@@ -166,6 +166,8 @@ type Table interface {
 	NumRows() int
 	GetCurrRow() data.RowData
 	CurrRow() int
+	SetCurrRow(row int) int
+	RowAtOffset(offset int) int
 	NextRow() int
 	PrevRow() int
 	FirstItem() int
@@ -206,6 +208,15 @@ func (m *BaseModel) GetDimensions() constants.Dimensions {
 
 func (m *BaseModel) GetConfig() config.SectionConfig {
 	return m.Config
+}
+
+func (m *BaseModel) SetCurrRow(row int) int {
+	return m.Table.SetCurrItem(row)
+}
+
+func (m *BaseModel) RowAtOffset(offset int) int {
+	tableOffset := offset - common.SearchHeight - common.TableHeaderHeight
+	return m.Table.RowAtOffset(tableOffset)
 }
 
 func (m *BaseModel) HasRepoNameInConfiguredFilter() bool {
