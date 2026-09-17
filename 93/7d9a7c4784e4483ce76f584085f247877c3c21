@@ -1,0 +1,112 @@
+internal/tui/components/footer/footer.go
+  s_b6764596f3920a::t_b314600e3c052b 57,59-62,89,94,144
+  s_b6764596f3920a::t_ebbb57d3e47f6b 14,53,58,63,160,162,166
+  s_b6764596f3920a::t_772e9c1ab9c304 84-85,87-88
+internal/tui/components/listviewport/listviewport.go
+  s_b6764596f3920a::t_d2cb554ef8ade7 109-119
+  s_b6764596f3920a::t_7b1d0e9e694774 90-108
+internal/tui/components/listviewport/listviewport_test.go
+  s_b6764596f3920a::t_a065348db58f4d 4,133-192
+internal/tui/components/sidebar/sidebar.go
+  s_b6764596f3920a::t_7b1d0e9e694774 39,49-50,53
+internal/tui/ui_test.go
+  s_b6764596f3920a::t_c846465c505062 1552-1569
+  s_b6764596f3920a::t_28d686fae9515f 22,1405-1477
+  s_b6764596f3920a::t_ae860d171137d7 1480-1551,1570-1573
+  s_b6764596f3920a::t_5a87a7ac5b3d38 1343-1404,1478-1479
+internal/tui/common/mouse.go
+  s_b6764596f3920a::t_14bf5b8e96cc8e 10-13,17-20,24-27
+  s_b6764596f3920a::t_8c94eb5be6c6a0 1-9,14-16,21-23,28-29
+internal/tui/ui.go
+  s_b6764596f3920a::t_ebbb57d3e47f6b 831,838,867,872,883,890,901,908,916,924,1033,1036
+  s_b6764596f3920a::t_4731f689823373 314,830,832-834,839-854,856-857,859,865-866,871,873-874,876-882,887-888,891,895-896,900,902-903,905-907,909-910,912-915,922-923,938,1034-1035,1037,1041-1042,1047-1048,1723,1728,1730,1732,1737,1739,1743-1758,1776-1780
+  s_b6764596f3920a::t_2f0ea6d133e14f 835-837,864,868-870,875,884-886,892-894,897-899,904,911,919-921,1781-1803
+  s_b6764596f3920a::t_d2cb554ef8ade7 917-918
+  s_b6764596f3920a::t_2ace0085c14c90 858,889
+  s_b6764596f3920a::t_8f7f57aaf42516 855
+  s_6a0006bfeda19a::t_596865b09604ba 1804
+internal/tui/components/tabs/testdata/test_section.go
+  s_b6764596f3920a::t_f0395b56b5fa7e 28-37
+internal/tui/components/prview/prview.go
+  s_b6764596f3920a::t_7b1d0e9e694774 51,762-768
+  s_b6764596f3920a::t_ebbb57d3e47f6b 532,542
+  s_b6764596f3920a::t_87b44ec3ea55f5 502,524
+  s_dd22871919767d::t_815187cd4ce23e 769
+internal/tui/markdown/body.go
+  s_b6764596f3920a::t_87b44ec3ea55f5 1-10,12-13,16-30,33-36
+  s_b6764596f3920a::t_2f0ea6d133e14f 11
+  s_b6764596f3920a::t_fdb9c2a66647af 15,32
+  s_b6764596f3920a::t_61ea63709b7441 14,31
+internal/tui/markdown/markdownRenderer.go
+  s_b6764596f3920a::t_87b44ec3ea55f5 33-35
+internal/tui/components/table/table.go
+  s_b6764596f3920a::t_7b1d0e9e694774 127-132
+  s_b6764596f3920a::t_d2cb554ef8ade7 133-136
+internal/tui/components/section/section.go
+  s_b6764596f3920a::t_d2cb554ef8ade7 170,215-220
+  s_b6764596f3920a::t_7b1d0e9e694774 169,213-214
+  s_dd22871919767d::t_f6dba1a4bbcfaf 221
+internal/tui/markdown/body_test.go
+  s_b6764596f3920a::t_b2fd4e2a43970b 77,86
+  s_b6764596f3920a::t_5fc6faf57aad0a 78-85
+  s_b6764596f3920a::t_87b44ec3ea55f5 1-19,22-39,47,76
+  s_b6764596f3920a::t_287475546aa0bf 48-49
+  s_b6764596f3920a::t_fdb9c2a66647af 40,50-75
+  s_b6764596f3920a::t_2f0ea6d133e14f 20-21
+  s_b6764596f3920a::t_a10c98c1a9eddf 41-46
+internal/tui/components/tabs/tabs.go
+  s_b6764596f3920a::t_7b1d0e9e694774 37
+internal/tui/components/carousel/carousel.go
+  s_b6764596f3920a::t_8c94eb5be6c6a0 11,391
+  s_b6764596f3920a::t_7b1d0e9e694774 29,154-161,390,392
+  s_b6764596f3920a::t_b52666f6664c74 4-5
+  s_c3889d5a25cb3b::t_391df26f4fbb60 393
+internal/tui/markdown/theme.go
+  s_b6764596f3920a::t_87b44ec3ea55f5 33-35
+internal/tui/components/issueview/issueview.go
+  s_b6764596f3920a::t_87b44ec3ea55f5 220,233
+internal/tui/components/carousel/carousel_test.go
+  s_b6764596f3920a::t_d58480eea3b097 1-40
+internal/tui/components/footer/footer_test.go
+  s_b6764596f3920a::t_f3c01835498fd6 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "937d9a7c4784e4483ce76f584085f247877c3c21",
+  "prompts": {},
+  "sessions": {
+    "s_6a0006bfeda19a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ae4f-ebbd-75d3-8d00-0324117593d1",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_b6764596f3920a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ade9-0459-7c82-87cf-79aca8f48ee6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_c3889d5a25cb3b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ae21-4d6b-77f1-9594-83665ab1bc59",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_dd22871919767d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ae0b-1dbb-7bd3-adb0-70df67258869",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    }
+  }
+}
