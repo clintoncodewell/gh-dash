@@ -352,7 +352,7 @@ func (parser ConfigParser) getDefaultConfig() Config {
 				Open:     true,
 				Width:    0.70,
 				Height:   0.60,
-				Position: "auto",
+				Position: "right",
 			},
 			PrsLimit:               20,
 			PrApproveComment:       "LGTM",

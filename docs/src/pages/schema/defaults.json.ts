@@ -10,6 +10,7 @@ export function GET() {
         preview: {
           open: true,
           width: 0.7,
+          position: "right",
         },
         prsLimit: 20,
         prApproveComment: "LGTM",
@@ -67,6 +68,14 @@ export function GET() {
               type: "number",
               minimum: 0,
               default: 0.7,
+            },
+            position: {
+              title: "Preview Pane Position",
+              description:
+                "Places the preview pane to the right or below the ticket list. Auto switches based on available width.",
+              type: "string",
+              enum: ["auto", "right", "bottom"],
+              default: "right",
             },
           },
         },

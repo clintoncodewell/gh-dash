@@ -35,7 +35,7 @@ defaults:
     open: true
     width: 80
     height: 0.6
-    position: auto
+    position: right
   prsLimit: 100
   issuesLimit: 100
   notificationsLimit: 100

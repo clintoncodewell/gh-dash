@@ -16,7 +16,7 @@ defaults:
     open: true
     width: 0.70
     height: 0.60
-    position: auto
+    position: right
   prsLimit: 20
   refetchIntervalMinutes: 30
   view: prs
@@ -24,7 +24,7 @@ defaults:
 
 By default, the dashboard is configured to:
 
-- Display the preview pane to the right at 70% width, or below at 60% height when the terminal is narrow.
+- Display the preview pane on the right at 70% width, including on narrow terminals.
 - Only fetch 20 PRs, issues, and notifications at a time for each section.
 - Display the PRs view when the dashboard loads.
 - Refetch PRs and issues for each section every 30 minutes.
@@ -174,7 +174,7 @@ By default, the preview pane height is 60%.
 
 | Type   |          Options          | Default |
 | :----- | :-----------------------: | :-----: |
-| String | `right`, `bottom`, `auto` | `auto`  |
+| String | `right`, `bottom`, `auto` | `right` |
 
 Specifies where the preview pane appears relative to the main content.
 
@@ -185,7 +185,7 @@ Specifies where the preview pane appears relative to the main content.
 
 You can toggle the position at runtime with the <kbd>P</kbd> key.
 
-By default, the position is `auto`.
+By default, the position is `right`.
 
 ### Refetch Interval in Minutes (`refetchIntervalMinutes`)
 

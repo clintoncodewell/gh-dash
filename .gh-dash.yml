@@ -45,5 +45,6 @@ defaults:
   preview:
     open: true
     width: 0.70
+    position: right
   prsLimit: 20
   issuesLimit: 20

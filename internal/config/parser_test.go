@@ -66,6 +66,7 @@ func TestParser(t *testing.T) {
 		testutils.AssertNoError(t, err)
 		require.Len(t, parsed.PRSections, 3)
 		require.Equal(t, 0.70, parsed.Defaults.Preview.Width)
+		require.Equal(t, "right", parsed.Defaults.Preview.Position)
 	})
 
 	t.Run("Should read config passed by flag with highest priority", func(t *testing.T) {

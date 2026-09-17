@@ -44,7 +44,7 @@ defaults:
     open: true
     width: 60
     height: 0.6
-    position: auto
+    position: right
   prsLimit: 5
   prApproveComment: LGTM
   issuesLimit: 5
