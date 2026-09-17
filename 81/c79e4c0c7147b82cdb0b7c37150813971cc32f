@@ -1,0 +1,137 @@
+internal/config/parser_test.go
+  s_b6764596f3920a::t_2295d99cd827ec 158,170
+  s_b6764596f3920a::t_ea2db5782b44c6 68
+  s_b6764596f3920a::t_a220484037ccce 149-157,159-169,171-172
+internal/tui/components/issuerow/issuerow_test.go
+  s_b6764596f3920a::t_a220484037ccce 1-30
+internal/tui/keys/keys_test.go
+  s_b6764596f3920a::t_7dbab8d92935d7 103,105
+internal/tui/components/prrow/prrow_test.go
+  s_b6764596f3920a::t_5482ed77230de9 11
+  s_b6764596f3920a::t_3a455466baa08b 18
+  s_b6764596f3920a::t_a220484037ccce 134-168
+internal/tui/components/prview/overview_test.go
+  s_b6764596f3920a::t_a220484037ccce 1-6,8-13,15,17,19-25
+  s_b6764596f3920a::t_4e63a0ba267ce4 7,18
+  s_b6764596f3920a::t_5482ed77230de9 14,16
+internal/tui/modelUtils.go
+  s_b6764596f3920a::t_e1fe1f22cf6ba2 224-228,247,250-255,265-270,280-284,286,301,304,306,311,323,328,338,343,350,353-355,357,374
+  s_b6764596f3920a::t_274aaad2d917e6 76,88,101,114,130-134,152-156,170-174
+internal/tui/components/footer/footer_test.go
+  s_b6764596f3920a::t_a220484037ccce 47-57,59-60,62-71,73,75-80,86
+  s_b6764596f3920a::t_efe8f0fb733aa6 58,74
+  s_b6764596f3920a::t_4b85a88b7c1d0a 72
+  s_b6764596f3920a::t_466ac43f29a7c3 61,81-85
+docs/src/content/docs/configuration/keybindings/index.mdx
+  s_b6764596f3920a::t_1010ba7611bd93 12-27
+internal/config/testdata/merged-config.golden.yml
+  s_b6764596f3920a::t_a79ec12092cdf1 66
+docs/src/pages/schema/defaults.json.ts
+  s_b6764596f3920a::t_4ae5dc763d203a 12,69
+docs/src/pages/schema/keybindings/entry.json.ts
+  s_b6764596f3920a::t_61bab50dd37a74 27-32,35,37-38
+  s_6f0d29c0701aad::t_927f9c625ea4d5 33-34,36,39
+docs/src/content/docs/configuration/defaults.mdx
+  s_b6764596f3920a::t_4ae5dc763d203a 17,27,153-155,159
+  s_6f0d29c0701aad::t_ddc3f04cb4401c 171,175-176,231-232
+docs/src/pages/schema/layout/pr.json.ts
+  s_b6764596f3920a::t_0a578572962ff0 32,196
+internal/tui/ui_test.go
+  s_b6764596f3920a::t_7a57a2a16f4c7e 25,182-216
+  s_b6764596f3920a::t_0eb44a627502f2 36-37,1591-1652,1654-1655,1657-1664,1666-1667,1669-1673
+  s_b6764596f3920a::t_33203f5a32a321 217,1533,1558,1586,1590,1677-1678
+  s_b6764596f3920a::t_154f6e0986b6b5 1665,1668
+  s_b6764596f3920a::t_e14ff8f78c79b2 1520-1532,1534-1557,1559-1585,1587-1589
+  s_b6764596f3920a::t_3c19bb46f4bae3 1653,1656,1674-1676
+  s_5c9d6853c94c54::t_bc83244cb560ae 218
+internal/config/testdata/global-config.golden.yml
+  s_b6764596f3920a::t_a79ec12092cdf1 75
+CONTRIBUTING.md
+  s_b6764596f3920a::t_0def0dde61998a 7,10-11,15-16,22-23,27-30,34-35,48,121-129
+  s_04f44d5e494ca9::t_0ce8a242a1622e 130
+.gh-dash.yml
+  s_b6764596f3920a::t_4ae5dc763d203a 4,11,16,18-19,21,23,25,27,29,31-33,37,47
+docs/src/content/docs/getting-started/keybindings/selected-issue.mdx
+  s_b6764596f3920a::t_7dbab8d92935d7 62,64-66,71,74
+  s_6f0d29c0701aad::t_de02b84d0bfd13 85-86
+AI_POLICY.md
+  s_b6764596f3920a::t_486400963997d3 1-34
+internal/config/parser.go
+  s_b6764596f3920a::t_64096e2b1c8579 204-208
+  s_b6764596f3920a::t_0a578572962ff0 393
+  s_b6764596f3920a::t_4ae5dc763d203a 353
+  s_6f0d29c0701aad::t_9ea03ba5271a00 209
+internal/tui/ui.go
+  s_b6764596f3920a::t_ef556fb3abb701 732-736,885-890,892-897,1198-1207
+  s_b6764596f3920a::t_83c746ea4cb9fa 830-838,891
+.github/pull_request_template.md
+  s_b6764596f3920a::t_b138b8ab56409a 1,3,5,7,9,11-23
+docs/src/content/docs/configuration/layout/pr.mdx
+  s_b6764596f3920a::t_0a578572962ff0 34,75,248-250,252-253
+README.md
+  s_b6764596f3920a::t_ef556fb3abb701 11-12,26,53,59,66-69
+  s_b6764596f3920a::t_61def1c0c9dcc8 54-55,60-61
+  s_b6764596f3920a::t_6bd10638273dff 36-52,56-58,62-63,71-72,77
+  s_b6764596f3920a::t_0def0dde61998a 2-10,13-22,24-25,31-35,162-165,187-188,202-205,207-208
+  s_b6764596f3920a::t_762df6f1866d5f 73-76
+  s_b6764596f3920a::t_0a9947e9e6fc3a 23,27-30,64-65,70,178,180-183
+scripts/gh-dash-herdr-ticket
+  s_b6764596f3920a::t_ae2fe1f359faaa 1-50,52-119,122-154,164-172,176,197-222,225,227-229,232-235,237-245,247-251,259,263-297,299-310,313-326,328-385,387-399
+  s_b6764596f3920a::t_ef556fb3abb701 51,120-121,155-163,175,177-196,223-224,226,230-231,236,246,252-258,260-262,298,311-312,327,386
+  s_b6764596f3920a::t_762df6f1866d5f 173-174
+internal/tui/keys/issueKeys.go
+  s_b6764596f3920a::t_7dbab8d92935d7 47
+internal/tui/components/footer/footer.go
+  s_b6764596f3920a::t_83c746ea4cb9fa 68-70,72-73,75-78,80,108,115,131-137,139-140,143-144
+  s_b6764596f3920a::t_466ac43f29a7c3 28,64-67,71,79,107,114,128-130,141,146-154
+  s_b6764596f3920a::t_efe8f0fb733aa6 74,127,138,142,145
+  s_b6764596f3920a::t_68073a1305671f 155
+internal/tui/components/issuerow/issuerow.go
+  s_04f44d5e494ca9::t_6e414f1e6629b3 12,95-96,98-99
+internal/tui/components/prrow/prrow.go
+  s_6f0d29c0701aad::t_0e9a98bd73e40c 86,89,142-144,146
+internal/tui/components/prview/prview.go
+  s_04f44d5e494ca9::t_568bb828d7bb98 197,200,203,206
+internal/tui/constants/constants.go
+  s_6f0d29c0701aad::t_6ada5ccc86df0a 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "81c79e4c0c7147b82cdb0b7c37150813971cc32f",
+  "prompts": {},
+  "sessions": {
+    "s_04f44d5e494ca9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ae62-6ff3-72d2-b73b-b8a5b9b2f7f9",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_5c9d6853c94c54": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ae7b-5061-74c3-9bfd-313c420ba71c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_6f0d29c0701aad": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ae83-ae4f-78c2-926c-50a8305cf14a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_b6764596f3920a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ade9-0459-7c82-87cf-79aca8f48ee6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    }
+  }
+}
