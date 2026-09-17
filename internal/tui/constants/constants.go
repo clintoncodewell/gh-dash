@@ -44,6 +44,7 @@ const (
 	BehindIcon         = "󰇮"
 	BlockedIcon        = ""
 	ClosedIcon         = ""
+	CodeChangesIcon    = ""
 	CodeReviewIcon     = ""
 	CommentIcon        = ""
 	CommentsIcon       = ""

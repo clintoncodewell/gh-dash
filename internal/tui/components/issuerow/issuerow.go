@@ -9,6 +9,7 @@ import (
 	"github.com/dlvhdr/gh-dash/v4/internal/data"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/table"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/constants"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/context"
 	"github.com/dlvhdr/gh-dash/v4/internal/utils"
 )
@@ -91,9 +92,11 @@ func (issue *Issue) renderAssignees() string {
 
 func (issue *Issue) renderStatus() string {
 	if issue.Data.State == "OPEN" {
-		return lipgloss.NewStyle().Foreground(issue.Ctx.Styles.Colors.OpenIssue).Render("")
+		return lipgloss.NewStyle().Foreground(issue.Ctx.Theme.SuccessText).
+			Render(constants.SuccessIcon)
 	} else {
-		return issue.getTextStyle().Render("")
+		return lipgloss.NewStyle().Foreground(issue.Ctx.Theme.ErrorText).
+			Render(constants.FailureIcon)
 	}
 }
 

@@ -25,6 +25,7 @@ type Model struct {
 	leftSection     *string
 	rightSection    *string
 	help            bbHelp.Model
+	issueAction     string
 	ShowAll         bool
 	ShowConfirmQuit bool
 }
@@ -60,6 +61,23 @@ func (m Model) View() string {
 			Foreground(m.ctx.Theme.SecondaryText).
 			Padding(0, 1).
 			Render("↻ R"))
+		issueIndicator := ""
+		if m.issueAction != "" {
+			label := " " + m.issueAction
+			issueIndicator = common.MarkMouseZone(m.issueAction, lipgloss.NewStyle().
+				Background(m.ctx.Theme.SelectedBackground).
+				Foreground(m.ctx.Theme.SecondaryText).
+				Padding(0, 1).
+				Render(label))
+		}
+		agentIndicator := ""
+		if agentKey := m.AgentKey(); agentKey != "" {
+			agentIndicator = common.MarkMouseZone("launch-agent", lipgloss.NewStyle().
+				Background(m.ctx.Theme.SelectedBackground).
+				Foreground(m.ctx.Theme.SuccessText).
+				Padding(0, 1).
+				Render("󰚩 "+agentKey))
+		}
 		donationIndicator := common.MarkMouseZone("donate", lipgloss.NewStyle().
 			Background(m.ctx.Theme.SelectedBackground).
 			Foreground(m.ctx.Theme.WarningText).
@@ -86,12 +104,15 @@ func (m Model) View() string {
 							lipgloss.Width(rightSection)-
 							lipgloss.Width(helpIndicator)-
 							lipgloss.Width(donationIndicator)-
+							lipgloss.Width(issueIndicator)-
+							lipgloss.Width(agentIndicator)-
 							lipgloss.Width(refreshIndicator),
 					)))
 
 		footer = m.ctx.Styles.Common.FooterStyle.
 			Render(lipgloss.JoinHorizontal(lipgloss.Top, viewSwitcher, leftSection, spacing,
-				rightSection, refreshIndicator, donationIndicator, helpIndicator))
+				rightSection, agentIndicator, issueIndicator, refreshIndicator, donationIndicator,
+				helpIndicator))
 	}
 
 	if m.ShowAll {
@@ -101,6 +122,35 @@ func (m Model) View() string {
 	}
 
 	return footer
+}
+
+func (m Model) AgentKey() string {
+	if m.ctx == nil || m.ctx.Config == nil {
+		return ""
+	}
+	var bindings []config.Keybinding
+	switch m.ctx.View {
+	case config.PRsView:
+		bindings = m.ctx.Config.Keybindings.Prs
+	case config.IssuesView:
+		bindings = m.ctx.Config.Keybindings.Issues
+	default:
+		return ""
+	}
+	for _, binding := range bindings {
+		if binding.Command != "" && binding.Footer == "agent" {
+			return binding.Key
+		}
+	}
+	return ""
+}
+
+func (m *Model) SetIssueAction(action string) {
+	m.issueAction = action
+}
+
+func (m Model) IssueAction() string {
+	return m.issueAction
 }
 
 func (m *Model) SetShowConfirmQuit(val bool) {

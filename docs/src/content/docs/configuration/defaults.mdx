@@ -14,7 +14,7 @@ defaults:
   prApproveComment: LGTM
   preview:
     open: true
-    width: 0.45
+    width: 0.70
     height: 0.60
     position: auto
   prsLimit: 20
@@ -24,7 +24,7 @@ defaults:
 
 By default, the dashboard is configured to:
 
-- Display the preview pane to the right at 45% width, or below at 40% height when the terminal is narrow.
+- Display the preview pane to the right at 70% width, or below at 60% height when the terminal is narrow.
 - Only fetch 20 PRs, issues, and notifications at a time for each section.
 - Display the PRs view when the dashboard loads.
 - Refetch PRs and issues for each section every 30 minutes.
@@ -150,13 +150,13 @@ By default, the dashboard displays the preview pane.
 
 #### Preview Pane Width (`width`)
 
-| Type    | Minimum | Default |
-| :------ | :-----: | :-----: |
-| Number  |    0    |  0.45   |
+| Type   | Minimum | Default |
+| :----- | :-----: | :-----: |
+| Number |    0    |  0.70   |
 
 Specifies the width of the preview pane. You can set the size to the percentage of the terminal size by using fractions (e.g. 0.4 would be 40%).
 
-By default, the preview pane is 45% wide.
+By default, the preview pane is 70% wide.
 
 #### Preview Pane Height (`height`)
 
@@ -168,12 +168,12 @@ Specifies the height of the preview pane when it appears below the main content 
 position mode). You can set the size to a percentage of the terminal height by using
 fractions (e.g. 0.4 would be 40%). Values greater than 1 specify a fixed number of rows.
 
-By default, the preview pane height is 40%.
+By default, the preview pane height is 60%.
 
 #### Preview Pane Position (`position`)
 
-| Type   |        Options         | Default |
-| :----- | :--------------------: | :-----: |
+| Type   |          Options          | Default |
+| :----- | :-----------------------: | :-----: |
 | String | `right`, `bottom`, `auto` | `auto`  |
 
 Specifies where the preview pane appears relative to the main content.
@@ -228,8 +228,8 @@ You may need to adjust the layout column width depending on your format.
 
 ### Default View (`view`)
 
-| Type   |              Options              | Default |
-| :----- | :-------------------------------: | :-----: |
+| Type   |             Options              | Default |
+| :----- | :------------------------------: | :-----: |
 | String | "notifications", "prs", "issues" |  "prs"  |
 
 This setting defines whether the dashboard should display the Notifications, PRs, or Issues
@@ -263,7 +263,6 @@ Pressing any other key dismisses the message.
 By default, dash doesn't need a confirmation.
 
 [approving a PR]: /getting-started/keybindings/selected-pr/#v---approve-pr
-
 
 ## Include Read Notifications (`includeReadNotifications`)
 

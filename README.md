@@ -1,4 +1,80 @@
 <br />
+
+> [!IMPORTANT]
+> This is an unofficial, workflow-focused community fork of
+> [dlvhdr/gh-dash](https://github.com/dlvhdr/gh-dash). The original project was
+> created by Dolev Hadar and its contributors. This fork is independently
+> maintained and is not affiliated with or endorsed by the upstream maintainers.
+
+## What this fork adds
+
+- Point-and-click GitHub triage in your terminal, without giving up gh-dash's
+  fast keyboard workflow.
+- Mouse-first navigation alongside the existing keyboard workflow: click views,
+  sections, rows, tabs, refresh, archive, and agent actions; scroll long ticket
+  previews with the wheel.
+- Cleaner issue and PR reading, including rendered Markdown, aligned wrapped
+  bullets, duplicate `Summary` heading cleanup, and a wider configurable preview.
+- Issue-focused triage with manual refresh, an archive workflow built on GitHub's
+  reversible close/reopen states, and simplified check/cross status markers.
+- Agent-launch hooks for ticket workflows, including optional success feedback;
+  this fork's maintainer uses them to start Codex agents in Herdr workspaces.
+
+Until the fork publishes binary releases, install it from source:
+
+```sh
+gh extension remove dash # if another gh-dash build is already installed
+git clone https://github.com/clintoncodewell/gh-dash.git
+cd gh-dash
+go build -o gh-dash .
+gh extension install .
+```
+
+The upstream documentation at [gh-dash.dev](https://gh-dash.dev) still applies
+unless a fork-specific difference is described here.
+
+### Optional Herdr ticket launcher
+
+The included helper creates or reuses a lowercase `tickets` workspace, prepares
+an isolated Git worktree, starts a Codex agent with the selected issue or PR as
+context, and leaves it running in Herdr without stealing focus.
+
+```sh
+install -m 755 scripts/gh-dash-herdr-ticket ~/.local/bin/gh-dash-herdr-ticket
+```
+
+Then add the action to both ticket views in `~/.config/gh-dash/config.yml`:
+
+```yaml
+keybindings:
+  prs:
+    - key: H
+      name: launch Herdr agent
+      footer: agent
+      successMessage: Herdr ticket ready
+      command: ~/.local/bin/gh-dash-herdr-ticket pr "{{.RepoName}}" "{{.PrNumber}}" "{{.RepoPath}}"
+  issues:
+    - key: H
+      name: launch Herdr agent
+      footer: agent
+      successMessage: Herdr ticket ready
+      command: ~/.local/bin/gh-dash-herdr-ticket issue "{{.RepoName}}" "{{.IssueNumber}}" "{{.RepoPath}}"
+```
+
+Add a matching `repoPaths` entry so the launcher knows which local checkout to
+use, for example `owner/repo: ~/code/repo`.
+
+If your config declares the upstream `https://gh-dash.dev/schema.json`, remove
+that schema comment when using fork-only options such as `footer` and
+`successMessage` until this fork publishes its own schema endpoint.
+
+The launcher defaults to Codex with the `gpt-5.6-sol` model at `xhigh` effort.
+Override these with `GH_DASH_AGENT_MODEL` and `GH_DASH_AGENT_EFFORT`. It uses the
+repository's default branch for new issue worktrees. Set `GH_DASH_WORKTREE_ROOT`
+to share one worktree parent across repositories; generated directory names are
+repository-qualified. It requires Herdr, GitHub CLI, Git, `jq`, and `iconv` on
+your `PATH`.
+
 <p align="center">
   <a  class="underline: none;" href="https://gh-dash.dev">
     <picture>
@@ -83,6 +159,10 @@ Thank you to all past and existing sponsors! 🙏🏽
 
 ## 🌟 Features
 
+- Full mouse navigation and preview scrolling
+- Markdown-friendly ticket summaries
+- Manual refresh and issue archive workflows
+- Configurable ticket-to-agent launch actions with success feedback
 - User-defined, per-repo, PRs & issues sections
 - Overridable vim-style keyboard hotkeys
 - Custom actions to perform your specific workflow needs
@@ -95,13 +175,17 @@ If you like quickly navigating with your keyboard, seeing the PRs and issues you
 
 `DASH` has an extensive docs site at [gh-dash.dev/getting-started](https://gh-dash.dev/getting-started).
 
-## 👥 Discord
+## 👥 Support
 
-Have questions? Join our [Discord community](https://discord.gg/SXNXp9NctV)!
+For this fork, open an issue in
+[clintoncodewell/gh-dash](https://github.com/clintoncodewell/gh-dash/issues).
+For the original project and its community, see
+[dlvhdr/gh-dash](https://github.com/dlvhdr/gh-dash).
 
 ## 🙏 Contributing
 
-See the contribution guide at [https://www.gh-dash.dev/contributing](https://www.gh-dash.dev/contributing/).
+See this fork's [contribution guide](CONTRIBUTING.md). Well-tested AI-assisted
+contributions are welcome under the [AI contribution policy](AI_POLICY.md).
 
 ## 🛞 Under the hood
 
@@ -115,6 +199,10 @@ See the contribution guide at [https://www.gh-dash.dev/contributing](https://www
 - [gh](https://github.com/cli/cli) for the GitHub functionality
 - [delta](https://github.com/dandavison/delta) for viewing PR diffs
 
-## Authors
+## Authors and attribution
 
-Dolev Hadar ([@dlvhdr](https://github.com/dlvhdr)) and the [community](https://github.com/dlvhdr/gh-dash/graphs/contributors).
+Original project: Dolev Hadar ([@dlvhdr](https://github.com/dlvhdr)) and the
+[upstream community](https://github.com/dlvhdr/gh-dash/graphs/contributors).
+
+Fork changes: [Clinton Codewell](https://github.com/clintoncodewell) and this
+fork's contributors. The original MIT license and copyright notice are preserved.

@@ -31,7 +31,7 @@ By default, PR views display the following columns in the order they're listed:
 1. [`numComments`] with a width of 3 columns.
 1. [`reviewStatus`] with a width of 3 columns.
 1. [`ci`] with a width of 3 columns.
-1. [`lines`] with a width of 16 columns.
+1. [`lines`] with a width of 3 columns.
 
 <Aside type="caution" title="Watch out!">
   Even though the `state`, `title`, `comments`, and `reactions` settings
@@ -72,7 +72,7 @@ base:
   width: 15
   hidden: true
 lines:
-  width: 16
+  width: 3
 ```
 
 ## PR Updated At Column
@@ -245,12 +245,11 @@ The heading for this column is <NerdFontIcon icon="nf-md-label_multiple_outline"
 
 # PR Lines Column
 
-| Property | Type | Default                                             |
-| :------- | :--- | :-------------------------------------------------- |
-| `lines`  | yaml | <Code code={`width: 16`} lang="yaml" frame="none"/> |
+| Property | Type | Default                                            |
+| :------- | :--- | :------------------------------------------------- |
+| `lines`  | yaml | <Code code={`width: 3`} lang="yaml" frame="none"/> |
 
-This column displays the line changes for a PR. The column represents the changes as
-`<added> / -<removed>`. For example, `66 / -46` indicates 66 lines added and 46
-lines removed.
+This column displays whether the PR changes code. A green change icon means
+additions or deletions are present; a faint empty icon means no code lines changed.
 
 The heading for this column is <NerdFontIcon icon="nf-oct-diff"/>.

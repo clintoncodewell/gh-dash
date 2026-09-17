@@ -44,7 +44,7 @@ var IssueKeys = IssueKeyMap{
 	),
 	Close: key.NewBinding(
 		key.WithKeys("x"),
-		key.WithHelp("x", "close"),
+		key.WithHelp("x", "archive"),
 	),
 	Reopen: key.NewBinding(
 		key.WithKeys("X"),

@@ -201,10 +201,12 @@ type RepoConfig struct {
 }
 
 type Keybinding struct {
-	Key     string `yaml:"key"`
-	Command string `yaml:"command,omitempty"`
-	Builtin string `yaml:"builtin,omitempty"`
-	Name    string `yaml:"name,omitempty"`
+	Key            string `yaml:"key"`
+	Command        string `yaml:"command,omitempty"`
+	Builtin        string `yaml:"builtin,omitempty"`
+	Name           string `yaml:"name,omitempty"`
+	SuccessMessage string `yaml:"successMessage,omitempty"`
+	Footer         string `yaml:"footer,omitempty"`
 }
 
 func (kb Keybinding) NewBinding(previous *key.Binding) key.Binding {
@@ -348,7 +350,7 @@ func (parser ConfigParser) getDefaultConfig() Config {
 		Defaults: Defaults{
 			Preview: PreviewConfig{
 				Open:     true,
-				Width:    0.45,
+				Width:    0.70,
 				Height:   0.60,
 				Position: "auto",
 			},
@@ -388,7 +390,7 @@ func (parser ConfigParser) getDefaultConfig() Config {
 						Hidden: utils.BoolPtr(true),
 					},
 					Lines: ColumnConfig{
-						Width: utils.IntPtr(lipgloss.Width(" +31.4k -31.6k ")),
+						Width: utils.IntPtr(3),
 					},
 				},
 				Issues: IssuesLayoutConfig{

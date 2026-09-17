@@ -100,9 +100,9 @@ func TestFullHelpIncludesIssueKeysForIssueSubject(t *testing.T) {
 		t.Error("expected Issue key 'checkout' to be present when viewing Issue notification")
 	}
 
-	found = findKeyByHelp(allKeys, "close")
+	found = findKeyByHelp(allKeys, "archive")
 	if !found {
-		t.Error("expected Issue key 'close' to be present when viewing Issue notification")
+		t.Error("expected Issue key 'archive' to be present when viewing Issue notification")
 	}
 
 	// Clean up

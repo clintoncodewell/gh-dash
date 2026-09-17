@@ -729,6 +729,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			scmd := m.updateSection(msg.SectionId, msg.SectionType, msg.Msg)
 			cmds = append(cmds, scmd)
+			if msg.Err == nil && m.ctx.View == config.IssuesView &&
+				(strings.HasPrefix(task.Id, "issue_close_") ||
+					strings.HasPrefix(task.Id, "issue_reopen_")) {
+				cmds = append(cmds, m.refreshAllSections())
+			}
 
 			syncCmd := m.syncSidebar()
 			cmds = append(cmds, syncCmd)
@@ -822,7 +827,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, m.onViewedRowChanged())
 		}
 
-	case execProcessFinishedMsg, tea.FocusMsg:
+	case execProcessFinishedMsg:
+		if msg.SuccessMessage != "" {
+			cmds = append(cmds, m.notify(msg.SuccessMessage))
+		}
+		if currSection != nil {
+			cmds = append(cmds, currSection.FetchNextPageSectionRows()...)
+		}
+
+	case tea.FocusMsg:
 		if currSection != nil {
 			cmds = append(cmds, currSection.FetchNextPageSectionRows()...)
 		}
@@ -866,6 +879,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if common.MouseZoneInBounds("refresh-all", msg) {
 			cmd := m.refreshAllSections()
+			m.syncMouseState()
+			return m, cmd
+		}
+		if action := m.footer.IssueAction(); action != "" &&
+			common.MouseZoneInBounds(action, msg) {
+			githubAction := map[string]string{"archive": "close", "reopen": "reopen"}[action]
+			cmd := m.promptConfirmation(currSection, githubAction)
+			m.syncMouseState()
+			return m, cmd
+		}
+		if agentKey := m.footer.AgentKey(); agentKey != "" &&
+			common.MouseZoneInBounds("launch-agent", msg) {
+			cmd := m.executeKeybinding(agentKey)
 			m.syncMouseState()
 			return m, cmd
 		}
@@ -1169,6 +1195,16 @@ func (m *Model) onWindowSizeChanged(msg tea.WindowSizeMsg) {
 }
 
 func (m *Model) syncProgramContext() {
+	m.footer.SetIssueAction("")
+	if m.ctx.View == config.IssuesView {
+		if issue, ok := m.getCurrRowData().(*data.IssueData); ok {
+			if issue.State == "OPEN" {
+				m.footer.SetIssueAction("archive")
+			} else if issue.State == "CLOSED" {
+				m.footer.SetIssueAction("reopen")
+			}
+		}
+	}
 	for _, section := range m.getCurrentViewSections() {
 		section.UpdateProgramContext(m.ctx)
 	}

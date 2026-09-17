@@ -1,12 +1,23 @@
-# Summary
+## What problem this solves
 
-Closes #<issue number>
+<!-- Describe the user-facing problem. Link it with Closes #123 or Related: #123. -->
 
-- [] I have read the [Contributing](../CONTRIBUTING.md) and the strict [No-AI Policy](../AI_POLICY.md) guides.
+## User impact
 
-## How Did You Test this Change?
+<!-- What becomes easier, safer, faster, or possible after this change? -->
 
-## Images/Videos
+## Why this change
 
-<!-- if relevant, please include any relevant images that show off how your feature is
-working -->
+<!-- Briefly explain the approach and important trade-offs. -->
+
+## Evidence
+
+<!-- Tests, terminal output, screenshots, recordings, or reproducible observations. -->
+
+- [ ] I understand and reviewed every change in this pull request.
+- [ ] I ran the relevant tests and included the useful evidence above.
+- [ ] I kept this pull request focused on one coherent change.
+- [ ] I am willing to respond to review and maintain this code.
+
+AI-assisted contributions are welcome. Disclosure is optional; quality,
+validation, and contributor responsibility are not.

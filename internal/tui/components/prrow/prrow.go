@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
-	"charm.land/lipgloss/v2/compat"
 	checks "github.com/dlvhdr/x/gh-checks"
 
 	"github.com/dlvhdr/gh-dash/v4/internal/git"
@@ -84,11 +83,10 @@ func (pr *PullRequest) renderState() string {
 		if pr.Data.Primary.IsDraft {
 			return mergeCellStyle.Foreground(pr.Ctx.Theme.FaintText).Render(constants.DraftIcon)
 		} else {
-			return mergeCellStyle.Foreground(pr.Ctx.Styles.Colors.OpenPR).Render(constants.OpenIcon)
+			return mergeCellStyle.Foreground(pr.Ctx.Theme.SuccessText).Render(constants.SuccessIcon)
 		}
 	case "CLOSED":
-		return mergeCellStyle.Foreground(pr.Ctx.Styles.Colors.ClosedPR).
-			Render(constants.ClosedIcon)
+		return mergeCellStyle.Foreground(pr.Ctx.Theme.ErrorText).Render(constants.FailureIcon)
 	case "MERGED":
 		return mergeCellStyle.Foreground(pr.Ctx.Styles.Colors.MergedPR).
 			Render(constants.MergedIcon)
@@ -136,44 +134,16 @@ func (pr *PullRequest) RenderLines(isSelected bool) string {
 	if pr.Data.Primary == nil {
 		return "-"
 	}
-	deletions := max(pr.Data.Primary.Deletions, 0)
-
-	var additionsFg, deletionsFg compat.AdaptiveColor
-	additionsFg = pr.Ctx.Theme.SuccessText
-	deletionsFg = pr.Ctx.Theme.ErrorText
-
 	baseStyle := lipgloss.NewStyle()
 	if isSelected {
 		baseStyle = baseStyle.Background(pr.Ctx.Theme.SelectedBackground)
 	}
 
-	additionsText := baseStyle.
-		Foreground(additionsFg).
-		Render(fmt.Sprintf("+%s", components.FormatNumber(pr.Data.Primary.Additions)))
-	deletionsText := baseStyle.
-		Foreground(deletionsFg).
-		Render(fmt.Sprintf("-%s", components.FormatNumber(deletions)))
+	if pr.Data.Primary.Additions > 0 || pr.Data.Primary.Deletions > 0 {
+		return baseStyle.Foreground(pr.Ctx.Theme.SuccessText).Render(constants.CodeChangesIcon)
+	}
 
-	return pr.getTextStyle().Render(
-		keepSameSpacesOnAddDeletions(
-			lipgloss.JoinHorizontal(
-				lipgloss.Left,
-				additionsText,
-				baseStyle.Render(" "),
-				deletionsText,
-			)),
-	)
-}
-
-func keepSameSpacesOnAddDeletions(str string) string {
-	strAsList := strings.Split(str, " ")
-	return fmt.Sprintf(
-		"%7s",
-		strAsList[0],
-	) + " " + fmt.Sprintf(
-		"%7s",
-		strAsList[1],
-	)
+	return baseStyle.Foreground(pr.Ctx.Theme.FaintText).Render(constants.EmptyIcon)
 }
 
 func (pr *PullRequest) renderTitle() string {

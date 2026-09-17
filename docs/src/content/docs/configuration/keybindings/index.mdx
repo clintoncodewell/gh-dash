@@ -9,6 +9,22 @@ When a user presses the key or key combination the dashboard shells out and exec
 
 To help you identify your custom commands, an additional `name` property can be supplied to describe it in the help menu.
 
+Add `successMessage` when you want a short confirmation in the footer after a
+custom command exits successfully:
+
+```yaml
+keybindings:
+  issues:
+    - key: H
+      name: launch agent
+      footer: agent
+      command: launch-agent {{.RepoName}} {{.IssueNumber}}
+      successMessage: Agent launched
+```
+
+Set `footer: agent` on one PR or issue command to expose it as the clickable
+agent control in the footer.
+
 There are 3 types of keybindings: `universal`, `prs` and `issues`.
 
 ## Key Values

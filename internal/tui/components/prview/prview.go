@@ -194,16 +194,16 @@ func (m *Model) viewOverviewTab() string {
 	body.WriteString(m.renderSummary())
 	body.WriteString("\n\n")
 	body.WriteString(
-		m.ctx.Styles.Common.MainTextStyle.MarginBottom(1).Underline(true).Render(" Changes"),
-	)
-	body.WriteString("\n")
-	body.WriteString(m.renderChangesOverview())
-	body.WriteString("\n\n")
-	body.WriteString(
 		m.ctx.Styles.Common.MainTextStyle.MarginBottom(1).Underline(true).Render(" Checks"),
 	)
 	body.WriteString("\n")
 	body.WriteString(m.renderChecksOverview())
+	body.WriteString("\n\n")
+	body.WriteString(
+		m.ctx.Styles.Common.MainTextStyle.MarginBottom(1).Underline(true).Render(" Changes"),
+	)
+	body.WriteString("\n")
+	body.WriteString(m.renderChangesOverview())
 
 	if m.editor.Mode() != cmpcontroller.ModeNone {
 		body.WriteString(m.ctx.Styles.Sidebar.InputBox.Render(m.editor.View()))

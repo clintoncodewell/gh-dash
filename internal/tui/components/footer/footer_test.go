@@ -44,3 +44,43 @@ func TestViewMarksRefreshAndViewControls(t *testing.T) {
 		}, 250*time.Millisecond, time.Millisecond, "expected mouse zone %q", id)
 	}
 }
+
+func TestViewMarksIssueWorkflowControls(t *testing.T) {
+	zone.NewGlobal()
+	zone.SetEnabled(true)
+
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../../../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	cfg.Keybindings.Issues = append(cfg.Keybindings.Issues, config.Keybinding{
+		Key:     "J",
+		Name:    "launch Herdr agent",
+		Command: "launch-agent",
+		Footer:  "agent",
+	})
+	ctx := &context.ProgramContext{
+		Config:      &cfg,
+		ScreenWidth: 160,
+		View:        config.IssuesView,
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+
+	m := NewModel(ctx)
+	m.SetIssueAction("archive")
+	zone.Scan(m.View())
+	require.Equal(t, "J", m.AgentKey())
+
+	for _, id := range []string{"launch-agent", "archive"} {
+		require.Eventually(t, func() bool {
+			return !zone.Get(id).IsZero()
+		}, 250*time.Millisecond, time.Millisecond, "expected mouse zone %q", id)
+	}
+}
+
+func TestAgentKeyBeforeConfigLoads(t *testing.T) {
+	m := NewModel(&context.ProgramContext{})
+	require.Empty(t, m.AgentKey())
+}

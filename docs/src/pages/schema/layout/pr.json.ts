@@ -29,7 +29,7 @@ export function GET() {
           hidden: true,
         },
         lines: {
-          width: 16,
+          width: 3,
         },
       },
       properties: {
@@ -193,7 +193,7 @@ export function GET() {
             },
           ],
           default: {
-            width: 16,
+            width: 3,
           },
         },
       },

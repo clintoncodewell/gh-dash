@@ -8,12 +8,14 @@ import (
 	"charm.land/lipgloss/v2/compat"
 	graphql "github.com/cli/shurcooL-graphql"
 	checks "github.com/dlvhdr/x/gh-checks"
+	"github.com/stretchr/testify/require"
 
 	"github.com/dlvhdr/gh-dash/v4/internal/config"
 	"github.com/dlvhdr/gh-dash/v4/internal/data"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/table"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/constants"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/context"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/theme"
 )
 
 func TestGetStatusChecksRollup(t *testing.T) {
@@ -127,6 +129,41 @@ func TestGetStatusChecksRollup(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRenderStateUsesTickAndCross(t *testing.T) {
+	ctx := testContext(t)
+	pr := PullRequest{Ctx: ctx, Data: &Data{Primary: &data.PullRequestData{State: "OPEN"}}}
+	require.Contains(t, pr.renderState(), constants.SuccessIcon)
+
+	pr.Data.Primary.State = "CLOSED"
+	require.Contains(t, pr.renderState(), constants.FailureIcon)
+}
+
+func TestRenderLinesShowsWhetherCodeChanged(t *testing.T) {
+	ctx := testContext(t)
+	pr := PullRequest{Ctx: ctx, Data: &Data{Primary: &data.PullRequestData{}}}
+
+	require.Contains(t, pr.RenderLines(false), constants.EmptyIcon)
+	require.NotContains(t, pr.RenderLines(false), "+")
+	require.NotContains(t, pr.RenderLines(false), "-")
+
+	pr.Data.Primary.Additions = 1
+	require.Contains(t, pr.RenderLines(false), constants.CodeChangesIcon)
+	require.NotContains(t, pr.RenderLines(false), "+1")
+}
+
+func testContext(t *testing.T) *context.ProgramContext {
+	t.Helper()
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../../../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	ctx := &context.ProgramContext{Config: &cfg}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+	return ctx
 }
 
 func TestRenderLabels(t *testing.T) {

@@ -22,6 +22,7 @@ import (
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/common"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/branchsidebar"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/footer"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/issuessection"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/issueview"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/notificationrow"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/notificationssection"
@@ -32,6 +33,8 @@ import (
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/section"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/sidebar"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/tabs"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/components/tasks"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/constants"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/context"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/keys"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/theme"
@@ -174,6 +177,43 @@ func TestPromptConfirmation_NilSection(t *testing.T) {
 	m := Model{}
 	cmd := m.promptConfirmation(nil, "close")
 	require.Nil(t, cmd, "promptConfirmation should return nil when section is nil")
+}
+
+func TestExternalCommandSuccessShowsFeedback(t *testing.T) {
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	var started context.Task
+	ctx := &context.ProgramContext{
+		Config: &cfg,
+		View:   config.IssuesView,
+		StartTask: func(task context.Task) tea.Cmd {
+			started = task
+			return nil
+		},
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+
+	m := Model{
+		ctx:              ctx,
+		keys:             keys.Keys,
+		sidebar:          sidebar.NewModel(),
+		footer:           footer.NewModel(ctx),
+		tabs:             tabs.NewModel(ctx),
+		prView:           prview.NewModel(ctx),
+		issueSidebar:     issueview.NewModel(ctx),
+		branchSidebar:    branchsidebar.NewModel(ctx),
+		notificationView: notificationview.NewModel(ctx),
+	}
+
+	updated, _ := m.Update(execProcessFinishedMsg{SuccessMessage: "Herdr agent launched"})
+	_ = updated.(Model)
+
+	require.Equal(t, "Herdr agent launched", started.StartText)
+	require.Equal(t, "Herdr agent launched", started.FinishedText)
 }
 
 func TestNotificationView_SwitchViewWithSKey(t *testing.T) {
@@ -1475,6 +1515,165 @@ func TestMouseNavigationDoesNotChangeRowDuringConfirmation(t *testing.T) {
 	})
 	m = updated.(Model)
 	require.Equal(t, 1, prSection.CurrRow())
+}
+
+func TestMouseClickIssueArchiveAndReopen(t *testing.T) {
+	for _, tc := range []struct {
+		name         string
+		state        string
+		zoneID       string
+		githubAction string
+	}{
+		{name: "archive open issue", state: "OPEN", zoneID: "archive", githubAction: "close"},
+		{name: "reopen closed issue", state: "CLOSED", zoneID: "reopen", githubAction: "reopen"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			zone.NewGlobal()
+			zone.SetEnabled(true)
+
+			cfg, err := config.ParseConfig(config.Location{
+				ConfigFlag:       "../config/testdata/test-config.yml",
+				SkipGlobalConfig: true,
+			})
+			require.NoError(t, err)
+			ctx := &context.ProgramContext{
+				Config:       &cfg,
+				ScreenWidth:  160,
+				ScreenHeight: 40,
+				View:         config.IssuesView,
+				StartTask:    func(task context.Task) tea.Cmd { return nil },
+			}
+			ctx.Theme = theme.ParseTheme(ctx.Config)
+			ctx.Styles = context.InitStyles(ctx.Theme)
+
+			issueSection := issuessection.NewModel(
+				0,
+				ctx,
+				config.IssuesSectionConfig{Title: "Tickets", Filters: "is:" + strings.ToLower(tc.state)},
+				time.Now(),
+				time.Now(),
+			)
+			issueSection.Issues = []data.IssueData{{Number: 7, Title: "Ticket", State: tc.state}}
+			issueSection.Table.SetRows(issueSection.BuildRows())
+
+			m := Model{
+				ctx:              ctx,
+				keys:             keys.Keys,
+				issues:           []section.Section{&issueSection},
+				currSectionId:    0,
+				sidebar:          sidebar.NewModel(),
+				footer:           footer.NewModel(ctx),
+				tabs:             tabs.NewModel(ctx),
+				prView:           prview.NewModel(ctx),
+				issueSidebar:     issueview.NewModel(ctx),
+				branchSidebar:    branchsidebar.NewModel(ctx),
+				notificationView: notificationview.NewModel(ctx),
+			}
+			m.syncMainContentDimensions()
+			m.syncProgramContext()
+			zone.Scan(m.footer.View())
+			require.Eventually(t, func() bool {
+				return !zone.Get(tc.zoneID).IsZero()
+			}, 250*time.Millisecond, time.Millisecond)
+			actionZone := zone.Get(tc.zoneID)
+
+			updated, _ := m.Update(tea.MouseClickMsg{
+				X:      actionZone.StartX,
+				Y:      actionZone.StartY,
+				Button: tea.MouseLeft,
+			})
+			m = updated.(Model)
+
+			require.True(t, issueSection.IsPromptConfirmationFocused())
+			require.Equal(t, tc.githubAction, issueSection.GetPromptConfirmationAction())
+		})
+	}
+}
+
+func TestMouseClickIgnoresStaleAgentZone(t *testing.T) {
+	zone.NewGlobal()
+	zone.SetEnabled(true)
+
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	cfg.Keybindings.Issues = append(cfg.Keybindings.Issues, config.Keybinding{
+		Key: "H", Command: "launch-agent", Footer: "agent",
+	})
+	cfg.Keybindings.Universal = append(cfg.Keybindings.Universal, config.Keybinding{
+		Key: "", Command: "must-not-run",
+	})
+	ctx := &context.ProgramContext{
+		Config: &cfg, ScreenWidth: 160, ScreenHeight: 40, View: config.IssuesView,
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+	m := NewModel(config.Location{}, Repositories{})
+	m.ctx = ctx
+	m.footer = footer.NewModel(ctx)
+	m.notificationView = notificationview.NewModel(ctx)
+
+	zone.Scan(m.footer.View())
+	require.Eventually(t, func() bool {
+		return !zone.Get("launch-agent").IsZero()
+	}, 250*time.Millisecond, time.Millisecond)
+	agentZone := zone.Get("launch-agent")
+
+	ctx.View = config.NotificationsView
+	updated, cmd := m.Update(tea.MouseClickMsg{
+		X: agentZone.StartX, Y: agentZone.StartY, Button: tea.MouseLeft,
+	})
+	m = updated.(Model)
+
+	require.Empty(t, m.footer.AgentKey())
+	require.Nil(t, cmd)
+}
+
+func TestSuccessfulIssueArchiveRefreshesIssueColumns(t *testing.T) {
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	ctx := &context.ProgramContext{
+		Config: &cfg, ScreenWidth: 160, ScreenHeight: 40, View: config.IssuesView,
+		StartTask: func(task context.Task) tea.Cmd { return nil },
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+
+	issueSection := issuessection.NewModel(
+		0, ctx, config.IssuesSectionConfig{Title: "Open", Filters: "is:open"},
+		time.Now(), time.Now(),
+	)
+	issueSection.Issues = []data.IssueData{{Number: 7, Title: "Ticket", State: "OPEN"}}
+	issueSection.Table.SetRows(issueSection.BuildRows())
+	originalSection := &issueSection
+
+	m := Model{
+		ctx: ctx, keys: keys.Keys, issues: []section.Section{originalSection},
+		currSectionId: 0, tasks: map[string]context.Task{
+			"issue_close_7": {Id: "issue_close_7"},
+		},
+		sidebar: sidebar.NewModel(), footer: footer.NewModel(ctx), tabs: tabs.NewModel(ctx),
+		prView: prview.NewModel(ctx), issueSidebar: issueview.NewModel(ctx),
+		branchSidebar: branchsidebar.NewModel(ctx), notificationView: notificationview.NewModel(ctx),
+	}
+
+	isClosed := true
+	updated, cmd := m.Update(constants.TaskFinishedMsg{
+		TaskId: "issue_close_7", SectionId: 0, SectionType: issuessection.SectionType,
+		Msg: tasks.UpdateIssueMsg{IssueNumber: 7, IsClosed: &isClosed},
+	})
+	m = updated.(Model)
+
+	require.NotNil(t, cmd)
+	require.Greater(t, len(m.issues), 1)
+	for _, refreshedSection := range m.issues {
+		require.NotSame(t, originalSection, refreshedSection)
+	}
 }
 
 func TestMouseClickSelectsRenderedRow(t *testing.T) {

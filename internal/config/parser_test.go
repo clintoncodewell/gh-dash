@@ -65,6 +65,7 @@ func TestParser(t *testing.T) {
 		parsed, err := ParseConfig(Location{})
 		testutils.AssertNoError(t, err)
 		require.Len(t, parsed.PRSections, 3)
+		require.Equal(t, 0.70, parsed.Defaults.Preview.Width)
 	})
 
 	t.Run("Should read config passed by flag with highest priority", func(t *testing.T) {
@@ -143,6 +144,30 @@ func TestParser(t *testing.T) {
 
 		testutils.AssertNoError(t, err)
 		require.Equal(t, NotificationsView, parsed.Defaults.View)
+	})
+
+	t.Run("Should parse a custom command success message", func(t *testing.T) {
+		dir := t.TempDir()
+		configPath := path.Join(dir, "config.yml")
+		err := os.WriteFile(configPath, []byte(`keybindings:
+  issues:
+    - key: H
+      name: launch agent
+      command: launch-agent
+      successMessage: Agent launched
+      footer: agent
+`), 0o600)
+		testutils.AssertNoError(t, err)
+
+		parsed, err := ParseConfig(Location{
+			ConfigFlag:       configPath,
+			SkipGlobalConfig: true,
+		})
+
+		testutils.AssertNoError(t, err)
+		require.Len(t, parsed.Keybindings.Issues, 1)
+		require.Equal(t, "Agent launched", parsed.Keybindings.Issues[0].SuccessMessage)
+		require.Equal(t, "agent", parsed.Keybindings.Issues[0].Footer)
 	})
 
 	t.Run("Should merge global config with passed config", func(t *testing.T) {

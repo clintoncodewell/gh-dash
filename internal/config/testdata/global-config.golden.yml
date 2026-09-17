@@ -72,7 +72,7 @@ defaults:
         width: 22
         hidden: true
       lines:
-        width: 15
+        width: 3
     issues:
       updatedAt:
         width: 5

@@ -59,18 +59,19 @@ runs `gh issue develop --checkout` in the repository's local path.
 The local path for the repository must be configured in your `config.yml` under `repoPaths`.
 If no local path is configured for the repository, the command will fail with an error.
 
-## `x` - Close Issue
+## `x` - Archive Issue
 
-Press <kbd>x</kbd> to close the issue. When you do, the dashboard uses the `gh issue close` command
-to close the issue.
+Press <kbd>x</kbd> to archive the issue. GitHub does not have a separate archived
+state for issues, so the dashboard uses `gh issue close`. Closed issues can be
+shown in a dedicated archive section with an `is:closed` filter.
 
 <Aside type="caution" title="Watch out!">
 **Prior to v3.10.0:** When you use this command, the dashboard closes the issue immediately and
 without prompting for confirmation. Only use this command when you're sure you
-want to close the issue.
+want to archive the issue.
 
 **Since v3.10.0:** When you use this command, the dashboard displays a confirmation prompt and
-closes the issue only after you approve the action.
+archives the issue only after you approve the action.
 
 This command doesn't support closing the issue with a comment. If you want to
 add a comment that explains why you're closing the issue, use the
@@ -81,7 +82,8 @@ add a comment that explains why you're closing the issue, use the
 ## `X` - Reopen Issue
 
 Press <kbd>X</kbd> to reopen a closed issue. When you do, the dashboard uses the `gh issue reopen`
-command to reopen the issue.
+command to reopen the issue. In an `is:closed` archive section, you can also
+click the footer's **reopen** control.
 
 <Aside type="caution" title="Watch out!">
 **Prior to v3.10.0:** When you use this command, the dashboard reopens the issue immediately and

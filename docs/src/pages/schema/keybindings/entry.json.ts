@@ -24,6 +24,19 @@ export function GET() {
             "The shell command that runs when you press the key combination.",
           type: "string",
         },
+        successMessage: {
+          title: "Success message",
+          description:
+            "A short footer message shown after the custom command exits successfully.",
+          type: "string",
+        },
+        footer: {
+          title: "Footer action",
+          description:
+            'Set to "agent" to expose this command as the clickable agent control in PR and issue views.',
+          type: "string",
+          enum: ["agent"],
+        },
         builtin: {
           title: "Builtin Command",
           description:
