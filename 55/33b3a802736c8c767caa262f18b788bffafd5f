@@ -1,0 +1,31 @@
+internal/config/parser_test.go
+  s_b6764596f3920a::t_25add112ccfe26 69
+docs/src/content/docs/configuration/defaults.mdx
+  s_b6764596f3920a::t_28b70ae4d0d1dd 19,27,177,188
+.gh-dash.yml
+  s_b6764596f3920a::t_f748cd954f3dbf 48
+docs/src/pages/schema/defaults.json.ts
+  s_b6764596f3920a::t_d68e02235b0084 13,72-79
+internal/config/parser.go
+  s_b6764596f3920a::t_b949c28625d6bb 355
+internal/config/testdata/global-config.golden.yml
+  s_b6764596f3920a::t_909c80022df560 47
+internal/config/testdata/merged-config.golden.yml
+  s_b6764596f3920a::t_c505eb6bb1ddca 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5533b3a802736c8c767caa262f18b788bffafd5f",
+  "prompts": {},
+  "sessions": {
+    "s_b6764596f3920a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ade9-0459-7c82-87cf-79aca8f48ee6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    }
+  }
+}
