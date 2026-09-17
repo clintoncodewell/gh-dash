@@ -6,6 +6,7 @@ on:
 permissions: read-all
 jobs:
   write-readme:
+    if: github.repository == 'dlvhdr/gh-dash'
     permissions:
       contents: write
     runs-on: ubuntu-latest

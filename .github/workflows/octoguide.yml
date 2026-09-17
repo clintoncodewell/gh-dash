@@ -1,6 +1,6 @@
 jobs:
   octoguide:
-    if: ${{ !endsWith(github.actor, '[bot]') }}
+    if: ${{ github.actor != github.repository_owner && !endsWith(github.actor, '[bot]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: OctoGuide/bot@0.21.10
@@ -15,7 +15,7 @@ jobs:
               "pr-linked-issue": true
             }
   octoguide-owner:
-    if: github.actor == 'dlvhdr'
+    if: github.actor == github.repository_owner
     runs-on: ubuntu-latest
     steps:
       - uses: OctoGuide/bot@0.21.10

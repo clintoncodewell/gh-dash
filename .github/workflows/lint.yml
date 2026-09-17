@@ -1,6 +1,12 @@
 name: lint
 on:
   pull_request:
+    paths-ignore:
+      - "docs/**"
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "docs/**"
 
 permissions:
   contents: read
