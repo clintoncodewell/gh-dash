@@ -1,0 +1,34 @@
+.github/workflows/publish-docs.yaml
+  s_b6764596f3920a::t_926461c23b7760 11
+.github/workflows/test.yaml
+  s_b6764596f3920a::t_926461c23b7760 7-10
+.github/workflows/lint.yml
+  s_b6764596f3920a::t_926461c23b7760 6-7
+  s_b6764596f3920a::t_48bfe469af59be 4-5,8-9
+.github/workflows/build-docs.yaml
+  s_b6764596f3920a::t_926461c23b7760 7-10
+  s_b6764596f3920a::t_48bfe469af59be 13-15
+.github/workflows/octoguide.yml
+  s_b6764596f3920a::t_926461c23b7760 18
+  s_b6764596f3920a::t_fe2fab03bb4ad6 3
+.github/workflows/build.yaml
+  s_b6764596f3920a::t_926461c23b7760 7-10
+.github/workflows/sponsors.yml
+  s_b6764596f3920a::t_926461c23b7760 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "96da46417fac1468cc1181e637d688d47bf7602b",
+  "prompts": {},
+  "sessions": {
+    "s_b6764596f3920a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ade9-0459-7c82-87cf-79aca8f48ee6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    }
+  }
+}
