@@ -122,7 +122,7 @@ tab_label="${repo_name} ${ticket_kind_label} #${ticket_number}"
 workspace_list=$("${herdr_cmd[@]}" workspace list)
 workspace_ids=$(
   printf '%s' "$workspace_list" \
-    | jq -r '.result.workspaces[]? | select(.label == "tickets") | .workspace_id'
+    | jq -r '.result.workspaces[]? | select((.label | gsub("^\\s+|\\s+$"; "")) == "tickets") | .workspace_id'
 )
 workspace_count=$(printf '%s\n' "$workspace_ids" | awk 'NF { count++ } END { print count + 0 }')
 
@@ -136,7 +136,7 @@ if [ "$workspace_count" -eq 1 ]; then
   tab_list=$("${herdr_cmd[@]}" tab list --workspace "$workspace_id")
   existing_tab_ids=$(
     printf '%s' "$tab_list" \
-      | jq -r --arg label "$tab_label" '.result.tabs[]? | select(.label == $label) | .tab_id'
+      | jq -r --arg label "$tab_label" '.result.tabs[]? | select((.label | gsub("^\\s+|\\s+$"; "")) == $label) | .tab_id'
   )
   existing_tab_count=$(printf '%s\n' "$existing_tab_ids" | awk 'NF { count++ } END { print count + 0 }')
   case "$existing_tab_count" in
