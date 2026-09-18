@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"os/exec"
 	"reflect"
+	"strings"
 	"text/template"
 	"time"
 
@@ -352,6 +354,89 @@ func (m *Model) runCustomNotificationCommand(
 
 type execProcessFinishedMsg struct {
 	SuccessMessage string
+}
+
+type issueCreateFinishedMsg struct {
+	RepoName string
+	Err      error
+}
+
+func resolveIssueCreateRepo(currRow data.RowData, filters, fallbackRepo string) (string, error) {
+	if currRow != nil {
+		value := reflect.ValueOf(currRow)
+		if value.Kind() != reflect.Ptr || !value.IsNil() {
+			if repoName := strings.TrimSpace(currRow.GetRepoNameWithOwner()); repoName != "" {
+				return repoName, nil
+			}
+		}
+	}
+
+	repositories := map[string]string{}
+	for token := range strings.FieldsSeq(filters) {
+		repoName, found := strings.CutPrefix(token, "repo:")
+		if !found {
+			continue
+		}
+		repoName = strings.Trim(strings.TrimSpace(repoName), `"'`)
+		if repoName != "" {
+			normalizedRepoName := strings.ToLower(repoName)
+			if _, found := repositories[normalizedRepoName]; !found {
+				repositories[normalizedRepoName] = repoName
+			}
+		}
+	}
+
+	if len(repositories) == 1 {
+		for _, repoName := range repositories {
+			return repoName, nil
+		}
+	}
+	if len(repositories) > 1 {
+		return "", errors.New(
+			"this section contains multiple repositories; select an existing issue to choose where to create the new one",
+		)
+	}
+	if fallbackRepo != "" {
+		return fallbackRepo, nil
+	}
+
+	return "", errors.New(
+		"add a repo:owner/name filter or open Dash from a repository before creating an issue",
+	)
+}
+
+func newIssueCommand(repoName string) *exec.Cmd {
+	return exec.Command("gh", "issue", "create", "--repo", repoName)
+}
+
+func issueCreateWasCancelled(err error) bool {
+	type exitCoder interface {
+		ExitCode() int
+	}
+
+	var exitErr exitCoder
+	return errors.As(err, &exitErr) && exitErr.ExitCode() == 2
+}
+
+func (m *Model) createIssue() tea.Cmd {
+	currSection := m.getCurrSection()
+	filters := ""
+	if currSection != nil {
+		filters = currSection.GetFilters()
+	}
+	fallbackRepo := ""
+	if m.ctx.HasGHRepo() {
+		fallbackRepo = fmt.Sprintf("%s/%s", m.ctx.GHRepo.Owner, m.ctx.GHRepo.Name)
+	}
+
+	repoName, err := resolveIssueCreateRepo(m.getCurrRowData(), filters, fallbackRepo)
+	if err != nil {
+		return func() tea.Msg { return constants.ErrMsg{Err: err} }
+	}
+
+	return tea.ExecProcess(newIssueCommand(repoName), func(err error) tea.Msg {
+		return issueCreateFinishedMsg{RepoName: repoName, Err: err}
+	})
 }
 
 func (m *Model) executeCustomCommand(cmd, successMessage string) tea.Cmd {

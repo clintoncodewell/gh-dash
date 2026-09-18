@@ -10,6 +10,19 @@ summary: >-
 
 import { Aside } from "@astrojs/starlight/components";
 
+## `n` - New Issue
+
+Press <kbd>n</kbd>, or click the <strong>＋ n</strong> footer action, to create
+a new issue. Dash temporarily opens GitHub CLI's interactive issue form in the
+same terminal, where you can enter the title and Markdown description, apply
+available metadata, review the result, and submit it. When the form exits, Dash
+returns and refreshes the Issues view.
+
+Dash creates the issue in the selected issue's repository. If there is no
+selection, it uses the section's single `repo:owner/name` filter or the repository
+where Dash was launched. If the destination is ambiguous, Dash asks you to select
+an issue or narrow the section to one repository.
+
 ## `a` - Assign Issue
 
 Press <kbd>a</kbd> to assign one or more users to the issue. When you do, the dashboard opens the

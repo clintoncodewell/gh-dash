@@ -468,6 +468,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case m.ctx.View == config.IssuesView:
 			switch {
+			case key.Matches(msg, keys.IssueKeys.Create):
+				return m, m.createIssue()
+
 			case key.Matches(msg, m.keys.OpenGithub):
 				cmds = append(cmds, m.openBrowser())
 
@@ -835,6 +838,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, currSection.FetchNextPageSectionRows()...)
 		}
 
+	case issueCreateFinishedMsg:
+		switch {
+		case msg.Err == nil:
+			cmds = append(cmds,
+				m.notify(fmt.Sprintf("Returned from issue creation for %s; refreshing", msg.RepoName)),
+				m.refreshAllSections(),
+			)
+		case issueCreateWasCancelled(msg.Err):
+			cmds = append(cmds, m.notify("Issue creation cancelled"))
+		default:
+			m.ctx.Error = fmt.Errorf(
+				"issue creation failed: %w; check GitHub CLI authentication and repository issue permissions",
+				msg.Err,
+			)
+		}
+
 	case tea.FocusMsg:
 		if currSection != nil {
 			cmds = append(cmds, currSection.FetchNextPageSectionRows()...)
@@ -879,6 +898,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if common.MouseZoneInBounds("refresh-all", msg) {
 			cmd := m.refreshAllSections()
+			m.syncMouseState()
+			return m, cmd
+		}
+		if m.ctx.View == config.IssuesView && common.MouseZoneInBounds("new-issue", msg) {
+			cmd := m.createIssue()
 			m.syncMouseState()
 			return m, cmd
 		}

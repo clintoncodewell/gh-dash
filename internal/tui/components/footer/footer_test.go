@@ -9,6 +9,7 @@ import (
 
 	"github.com/dlvhdr/gh-dash/v4/internal/config"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/context"
+	"github.com/dlvhdr/gh-dash/v4/internal/tui/keys"
 	"github.com/dlvhdr/gh-dash/v4/internal/tui/theme"
 )
 
@@ -72,12 +73,41 @@ func TestViewMarksIssueWorkflowControls(t *testing.T) {
 	m.SetIssueAction("archive")
 	zone.Scan(m.View())
 	require.Equal(t, "J", m.AgentKey())
+	require.Contains(t, m.View(), "＋ n")
 
-	for _, id := range []string{"launch-agent", "archive"} {
+	for _, id := range []string{"new-issue", "launch-agent", "archive"} {
 		require.Eventually(t, func() bool {
 			return !zone.Get(id).IsZero()
 		}, 250*time.Millisecond, time.Millisecond, "expected mouse zone %q", id)
 	}
+}
+
+func TestViewUsesReboundIssueCreateKey(t *testing.T) {
+	originalKeys := keys.IssueKeys.Create.Keys()
+	originalHelp := keys.IssueKeys.Create.Help()
+	keys.IssueKeys.Create.SetKeys("N")
+	keys.IssueKeys.Create.SetHelp("N", originalHelp.Desc)
+	defer func() {
+		keys.IssueKeys.Create.SetKeys(originalKeys...)
+		keys.IssueKeys.Create.SetHelp(originalHelp.Key, originalHelp.Desc)
+	}()
+
+	cfg, err := config.ParseConfig(config.Location{
+		ConfigFlag:       "../../../config/testdata/test-config.yml",
+		SkipGlobalConfig: true,
+	})
+	require.NoError(t, err)
+	ctx := &context.ProgramContext{
+		Config:      &cfg,
+		ScreenWidth: 160,
+		View:        config.IssuesView,
+	}
+	ctx.Theme = theme.ParseTheme(ctx.Config)
+	ctx.Styles = context.InitStyles(ctx.Theme)
+
+	view := NewModel(ctx).View()
+	require.Contains(t, view, "＋ N")
+	require.NotContains(t, view, "＋ n")
 }
 
 func TestAgentKeyBeforeConfigLoads(t *testing.T) {

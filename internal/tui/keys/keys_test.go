@@ -227,6 +227,36 @@ func TestRebindNotificationKeys_CustomCommand(t *testing.T) {
 	}
 }
 
+func TestIssueCreateKeyDefaultsAndCanBeRebound(t *testing.T) {
+	originalKeys := IssueKeys.Create.Keys()
+	originalHelp := IssueKeys.Create.Help()
+	defer func() {
+		IssueKeys.Create.SetKeys(originalKeys...)
+		IssueKeys.Create.SetHelp(originalHelp.Key, originalHelp.Desc)
+	}()
+
+	if len(originalKeys) != 1 || originalKeys[0] != "n" {
+		t.Fatalf("expected new issue key to default to n, got %v", originalKeys)
+	}
+
+	err := rebindIssueKeys([]config.Keybinding{
+		{Builtin: "create", Key: "N", Name: "create ticket"},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if got := IssueKeys.Create.Keys(); len(got) != 1 || got[0] != "N" {
+		t.Errorf("expected create key to be rebound to N, got %v", got)
+	}
+	if got := IssueKeys.Create.Help().Desc; got != "create ticket" {
+		t.Errorf("expected custom help text, got %q", got)
+	}
+	if got := IssueKeys.Create.Help().Key; got != "N" {
+		t.Errorf("expected help key to be rebound to N, got %q", got)
+	}
+}
+
 func TestFullHelpIncludesCustomNotificationBindings(t *testing.T) {
 	// Set up custom notification bindings
 	CustomNotificationBindings = []key.Binding{

@@ -78,6 +78,14 @@ func (m Model) View() string {
 				Padding(0, 1).
 				Render("󰚩 "+agentKey))
 		}
+		newIssueIndicator := ""
+		if createKey := keys.IssueKeys.Create.Help().Key; m.ctx.View == config.IssuesView && createKey != "" {
+			newIssueIndicator = common.MarkMouseZone("new-issue", lipgloss.NewStyle().
+				Background(m.ctx.Theme.SelectedBackground).
+				Foreground(m.ctx.Theme.SuccessText).
+				Padding(0, 1).
+				Render("＋ "+createKey))
+		}
 		donationIndicator := common.MarkMouseZone("donate", lipgloss.NewStyle().
 			Background(m.ctx.Theme.SelectedBackground).
 			Foreground(m.ctx.Theme.WarningText).
@@ -106,13 +114,24 @@ func (m Model) View() string {
 							lipgloss.Width(donationIndicator)-
 							lipgloss.Width(issueIndicator)-
 							lipgloss.Width(agentIndicator)-
+							lipgloss.Width(newIssueIndicator)-
 							lipgloss.Width(refreshIndicator),
 					)))
 
 		footer = m.ctx.Styles.Common.FooterStyle.
-			Render(lipgloss.JoinHorizontal(lipgloss.Top, viewSwitcher, leftSection, spacing,
-				rightSection, agentIndicator, issueIndicator, refreshIndicator, donationIndicator,
-				helpIndicator))
+			Render(lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				viewSwitcher,
+				leftSection,
+				spacing,
+				rightSection,
+				newIssueIndicator,
+				agentIndicator,
+				issueIndicator,
+				refreshIndicator,
+				donationIndicator,
+				helpIndicator,
+			))
 	}
 
 	if m.ShowAll {

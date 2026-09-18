@@ -83,7 +83,7 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 			additionalKeys = append(additionalKeys, PRFullHelp()...)
 			customKeys = append(customKeys, CustomPRBindings...)
 		case NotificationSubjectIssue:
-			additionalKeys = append(additionalKeys, IssueFullHelp()...)
+			additionalKeys = append(additionalKeys, IssueDetailFullHelp()...)
 			customKeys = append(customKeys, CustomIssueBindings...)
 		}
 	default:

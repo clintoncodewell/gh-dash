@@ -15,8 +15,9 @@
   previews with the wheel.
 - Cleaner issue and PR reading, including rendered Markdown, aligned wrapped
   bullets, duplicate `Summary` heading cleanup, and a wider configurable preview.
-- Issue-focused triage with manual refresh, an archive workflow built on GitHub's
-  reversible close/reopen states, and simplified check/cross status markers.
+- Issue-focused triage with in-terminal ticket creation, manual refresh, an
+  archive workflow built on GitHub's reversible close/reopen states, and
+  simplified check/cross status markers.
 - Agent-launch hooks for ticket workflows, including optional success feedback;
   this fork's maintainer uses them to start Codex agents in Herdr workspaces.
 
