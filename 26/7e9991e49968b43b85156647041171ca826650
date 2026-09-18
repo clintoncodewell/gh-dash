@@ -1,0 +1,62 @@
+internal/tui/keys/keys_test.go
+  s_b6764596f3920a::t_47ca29c4589d06 255-257
+  s_b6764596f3920a::t_8cd341bbe73adb 230-254,258-259
+internal/tui/ui.go
+  s_b6764596f3920a::t_47ca29c4589d06 842-843,848-850
+  s_b6764596f3920a::t_618128f6fb2859 845,851-854
+  s_b6764596f3920a::t_1f881001557ebf 471-473,841,844,846-847,904-905
+  s_b6764596f3920a::t_4a92aec598e1b6 855-856
+  s_b6764596f3920a::t_b3e409e4c16930 906-908
+internal/tui/keys/issueKeys.go
+  s_b6764596f3920a::t_0ef33b2d34bc88 13,26-29,69-72,113-114
+internal/tui/modelUtils.go
+  s_b6764596f3920a::t_47ca29c4589d06 374,382-385,390,410-418
+  s_b6764596f3920a::t_a9fdc08fa2eb48 8,10,359-373,375-381,386-389,391-409,419-440
+  s_c3889d5a25cb3b::t_d88c2287dc0927 441
+internal/tui/modelUtils_test.go
+  s_b6764596f3920a::t_47ca29c4589d06 4,22,53-56,64-65,101-114
+  s_b6764596f3920a::t_b012033af89404 5
+  s_b6764596f3920a::t_618128f6fb2859 10-11,27,57-63,83
+  s_b6764596f3920a::t_8cd341bbe73adb 1-3,6-9,12-21,23-26,28-52,66-82,84-100,115
+internal/tui/components/footer/footer_test.go
+  s_b6764596f3920a::t_a6e18f0be99c90 12
+  s_b6764596f3920a::t_22fdefd509684d 78
+  s_b6764596f3920a::t_c7945c75cf1dfb 76,85-110
+  s_c3889d5a25cb3b::t_0299857ccc77a0 111-112
+docs/src/content/docs/configuration/keybindings/index.mdx
+  s_b6764596f3920a::t_a53ce538de2e1b 180
+internal/tui/keys/keys.go
+  s_b6764596f3920a::t_0ef33b2d34bc88 86
+docs/src/content/docs/getting-started/keybindings/selected-issue.mdx
+  s_b6764596f3920a::t_a53ce538de2e1b 13-25
+README.md
+  s_b6764596f3920a::t_a53ce538de2e1b 18-20
+internal/tui/components/footer/footer.go
+  s_b6764596f3920a::t_22fdefd509684d 81,83-86,88,117
+  s_b6764596f3920a::t_c7945c75cf1dfb 82,87
+  s_b6764596f3920a::t_aa35a28f5e7d4d 122-134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "267e9991e49968b43b85156647041171ca826650",
+  "prompts": {},
+  "sessions": {
+    "s_b6764596f3920a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ade9-0459-7c82-87cf-79aca8f48ee6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    },
+    "s_c3889d5a25cb3b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ae21-4d6b-77f1-9594-83665ab1bc59",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    }
+  }
+}
