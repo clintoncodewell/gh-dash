@@ -159,7 +159,22 @@ if [ -n "$gh_axi_bin" ]; then
   }
   ticket_context=$("$gh_axi_bin" "$ticket_kind" view "$ticket_number" --repo "$repo_name" --full)
 else
-  ticket_context=$("$gh_bin" "$ticket_kind" view "$ticket_number" --repo "$repo_name")
+  # Plain `gh ... view` requests deprecated Projects (classic) fields on some
+  # GitHub CLI versions. Explicit JSON fields keep ticket launch independent of
+  # that retired API while remaining portable for users without gh-axi.
+  case "$ticket_kind" in
+    issue)
+      ticket_fields=number,title,body,state,author,assignees,labels,comments,url,createdAt,updatedAt
+      ;;
+    pr)
+      ticket_fields=number,title,body,state,author,assignees,labels,comments,url,createdAt,updatedAt,baseRefName,headRefName,isDraft,reviewDecision,mergeable
+      ;;
+  esac
+  ticket_context=$(
+    "$gh_bin" "$ticket_kind" view "$ticket_number" \
+      --repo "$repo_name" \
+      --json "$ticket_fields"
+  )
 fi
 
 ticket_context_bytes=$(printf '%s' "$ticket_context" | wc -c)
