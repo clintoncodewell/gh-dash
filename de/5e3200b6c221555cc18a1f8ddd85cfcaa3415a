@@ -1,0 +1,20 @@
+scripts/gh-dash-herdr-ticket
+  s_b6764596f3920a::t_51e81ab1de2639 162-164
+  s_b6764596f3920a::t_75efe70845277d 165-177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "de5e3200b6c221555cc18a1f8ddd85cfcaa3415a",
+  "prompts": {},
+  "sessions": {
+    "s_b6764596f3920a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ade9-0459-7c82-87cf-79aca8f48ee6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "clintoncodewell <clinton@advisewell.co>"
+    }
+  }
+}
